@@ -73,5 +73,8 @@
     <a class="btn" href="ambil/">Ambil Antrian</a>
     <a class="btn" href="panggil/">Tampilkan Antrian</a>
   </div>
+  <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
+  &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I
+</footer>
 </body>
 </html>
