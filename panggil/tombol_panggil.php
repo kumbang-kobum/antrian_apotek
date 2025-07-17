@@ -110,14 +110,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- KIRI: VIDEO -->
-    <div class="video-column">
-      <video autoplay muted loop id="edukasiVideo">
-        <source src="../assets/video/edukasi.mp4" type="video/mp4">
-        Video tidak tersedia.
-      </video>
-    </div>
-
     <!-- KANAN: ANTRIAN NON & RACIK -->
     <div class="antrian-columns">
       <!-- Non Racikan -->
@@ -143,96 +135,81 @@
   </div>
 
   <script src="../assets/js/audio.js"></script>
-<script>
-  const vid = document.getElementById("edukasiVideo");
-  vid.addEventListener("ended", function () {
-    this.currentTime = 0;
-    this.play();
+  <script>
+//     const vid = document.getElementById("edukasiVideo");
+//     vid.addEventListener("ended", function () {
+//     this.currentTime = 0;
+//     this.play();
+//   });
+
+    function loadDaftarAntrian(jenis) {
+  fetch('get_daftar_antrian.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'jenis=' + encodeURIComponent(jenis)
+  })
+  .then(res => res.json())
+  .then(data => {
+    const idList = jenis === 'Non Racik' ? 'list_nonracik' : 'list_racik';
+    const listEl = document.getElementById(idList);
+    listEl.innerHTML = "";
+
+    data.forEach((item) => {
+      const row = document.createElement("div");
+      row.innerText = `${item.no_antrian} - ${item.nama}`;
+      listEl.appendChild(row);
+    });
   });
+}
 
-  function loadDaftarAntrian(jenis) {
-    fetch('get_daftar_antrian.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'jenis=' + encodeURIComponent(jenis)
-    })
-    .then(res => res.json())
-    .then(data => {
-      const idList = jenis === 'Non Racik' ? 'list_nonracik' : 'list_racik';
-      const listEl = document.getElementById(idList);
-      listEl.innerHTML = "";
-      data.forEach((item) => {
-        const row = document.createElement("div");
-        row.innerText = `${item.no_antrian} - ${item.nama}`;
-        listEl.appendChild(row);
-      });
-    });
-  }
-
-  function loadLastAntrian() {
-    fetch('get_last_antrian.php')
-      .then(res => res.json())
-      .then(data => {
-        if (data["Non Racik"]) {
-          document.getElementById("nonracik_antrian").innerText = data["Non Racik"].nomor;
-          document.getElementById("nonracik_nama").innerText = data["Non Racik"].nama;
-        }
-        if (data["Racik"]) {
-          document.getElementById("racik_antrian").innerText = data["Racik"].nomor;
-          document.getElementById("racik_nama").innerText = data["Racik"].nama;
-        }
-      });
-  }
-
-  const lastAntrian = {
-    "Non Racik": { nomor: "000", nama: "-" },
-    "Racik": { nomor: "000", nama: "-" }
-  };
-
-  function panggil(jenis) {
-    fetch('get_antrian.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'jenis=' + encodeURIComponent(jenis)
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'sukses') {
-        lastAntrian[jenis] = {
-          nomor: data.no_antrian,
-          nama: data.nama ?? "-"
-        };
-        const idPrefix = jenis === 'Non Racik' ? 'nonracik' : 'racik';
-        document.getElementById(idPrefix + '_antrian').innerText = data.no_antrian;
-        document.getElementById(idPrefix + '_nama').innerText = lastAntrian[jenis].nama;
-        mainkanAudio(data.no_antrian, jenis);
-      } else {
-        alert("Tidak ada antrian " + jenis + " tersedia.");
-      }
-    });
-  }
-
-  function panggilUlang(jenis) {
-    const antrian = lastAntrian[jenis];
-    if (antrian.nomor === "000") {
-      alert("Belum ada antrian yang dipanggil untuk " + jenis);
-      return;
-    }
-    mainkanAudio(antrian.nomor, jenis);
-  }
-
-  // ⏱ Jalankan otomatis setiap 10 detik
-  setInterval(() => {
-    loadDaftarAntrian('Non Racik');
-    loadDaftarAntrian('Racik');
-    loadLastAntrian(); // <= INI HARUS ADA
-  }, 10000);
-
-  // 🔁 Jalankan saat awal load
+// Jalankan otomatis setiap 10 detik
+setInterval(() => {
   loadDaftarAntrian('Non Racik');
   loadDaftarAntrian('Racik');
-  loadLastAntrian();
-</script>
+}, 10000);
+
+// Panggil sekali saat pertama load
+loadDaftarAntrian('Non Racik');
+loadDaftarAntrian('Racik');
+
+    const lastAntrian = {
+      "Non Racik": { nomor: "000", nama: "-" },
+      "Racik": { nomor: "000", nama: "-" }
+    };
+
+    function panggil(jenis) {
+      fetch('get_antrian.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'jenis=' + encodeURIComponent(jenis)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'sukses') {
+          lastAntrian[jenis] = {
+            nomor: data.no_antrian,
+            nama: data.nama ?? "-"
+          };
+
+          const idPrefix = jenis === 'Non Racik' ? 'nonracik' : 'racik';
+          document.getElementById(idPrefix + '_antrian').innerText = data.no_antrian;
+          document.getElementById(idPrefix + '_nama').innerText = lastAntrian[jenis].nama;
+          mainkanAudio(data.no_antrian, jenis);
+        } else {
+          alert("Tidak ada antrian " + jenis + " tersedia.");
+        }
+      });
+    }
+
+    function panggilUlang(jenis) {
+      const antrian = lastAntrian[jenis];
+      if (antrian.nomor === "000") {
+        alert("Belum ada antrian yang dipanggil untuk " + jenis);
+        return;
+      }
+      mainkanAudio(antrian.nomor, jenis);
+    }
+  </script>
   <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
   &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani
 </footer>

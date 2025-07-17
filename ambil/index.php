@@ -1,5 +1,5 @@
-<!-- 
- Pembuat Chandra Irawan M.T.I
+<!DOCTYPE html>
+<!-- Pembuat Chandra Irawan M.T.I
  Bagi yang ingin menggunakan dan melakukan perubahan atau penambahan
  sangat di perbolehkan, namun aplikasi ini tidak untuk diperjual/belikan
  bagi yang ingin berdonasi secangkir kopi bisa melalui
@@ -7,7 +7,6 @@
  ingat untuk tidak DIPERJUAL BELIKAN ini bersifat open source
  pengembagan aplikasi ini berdasarkan logic aplikasi delphi yang telah dibuat oleh 
  Emirza Wira M.T.I yang berbentul exe -->
-<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -120,8 +119,5 @@
         });
     }
     </script>
-    <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
-  &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani
-</footer>
 </body>
 </html>
