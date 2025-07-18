@@ -77,6 +77,19 @@
         <div id="hasil"></div>
     </div>
 
+    <!-- Modal cetak -->
+    <div id="popupCetak" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; color:black; padding:30px; border-radius:15px; width:300px; text-align:center;">
+            <h3>Nomor Antrian</h3>
+            <h1 id="popup_no_antrian" style="font-size:60px; margin:10px 0;">000</h1>
+            <p id="popup_nama_pasien">Nama Pasien</p>
+            <p id="popup_jenis">Jenis: -</p>
+            <br>
+            <button onclick="window.print()">Cetak</button>
+            <button onclick="tutupPopup()">Tutup</button>
+        </div>
+    </div>
+
     <script>
     function ambil() {
         let no_rawat = document.getElementById('no_rawat').value;
@@ -102,22 +115,60 @@
         });
     }
 
-    function simpan(no_rawat, no_resep, no_antrian, resep) {
-        fetch('simpan_antrian.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `no_rawat=${no_rawat}&no_resep=${no_resep}&no_antrian=${no_antrian}&resep=${resep}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'sukses') {
-                alert("Antrian berhasil disimpan!");
-                location.reload();
-            } else {
-                alert("Gagal menyimpan antrian.");
-            }
-        });
-    }
+//     function simpan(no_rawat, no_resep, no_antrian, resep) {
+//     fetch('simpan_antrian.php', {
+//         method: 'POST',
+//         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+//         body: `no_rawat=${no_rawat}&no_resep=${no_resep}&no_antrian=${no_antrian}&resep=${resep}`
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         if (data.status === 'sukses') {
+//             alert("Antrian berhasil disimpan!");
+
+//             // Buka halaman cetak (popup atau tab baru)
+//             window.open(`cetak_antrian.php?no_antrian=${encodeURIComponent(no_antrian)}&nm_pasien=${encodeURIComponent(document.querySelector("#hasil").innerText.match(/Nama:\s(.+)/)[1])}&resep=${encodeURIComponent(resep)}`, '_blank');
+
+//             location.reload();
+//         } else {
+//             alert("Gagal menyimpan antrian.");
+//         }
+//     });
+// }
+
+function simpan(no_rawat, no_resep, no_antrian, resep) {
+    fetch('simpan_antrian.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `no_rawat=${no_rawat}&no_resep=${no_resep}&no_antrian=${no_antrian}&resep=${resep}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'sukses') {
+            alert("Antrian berhasil disimpan!");
+
+            // Ambil nama pasien dari div hasil
+            let nama = document.querySelector("#hasil").innerHTML.match(/<strong>Nama:<\/strong>\s(.+?)<br>/)[1];
+
+            // Tampilkan ke modal popup
+            document.getElementById("popup_no_antrian").innerText = no_antrian;
+            document.getElementById("popup_nama_pasien").innerText = nama;
+            document.getElementById("popup_jenis").innerText = "Jenis: " + resep;
+            document.getElementById("popupCetak").style.display = "flex";
+
+            // Opsional: kosongkan form
+            document.getElementById("no_rawat").value = "";
+            document.getElementById("hasil").innerHTML = "";
+
+        } else {
+            alert("Gagal menyimpan antrian.");
+        }
+    });
+}
+
+function tutupPopup() {
+    document.getElementById("popupCetak").style.display = "none";
+}
     </script>
 </body>
 </html>
