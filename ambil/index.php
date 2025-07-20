@@ -21,6 +21,54 @@
             color: white;
         }
 
+        @media print {
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+        }
+
+        button, input, #hasil, .container > h3 {
+            display: none !important;
+        }
+
+        #popupCetak {
+            position: static !important;
+            display: flex !important;
+            justify-content: flex-start !important;
+            align-items: flex-start !important;
+            background: none !important;
+            height: auto !important;
+        }
+
+        #popupCetak > div {
+            box-shadow: none !important;
+            border: none !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        #popup_no_antrian {
+            font-size: 32pt !important;
+            margin-top: 0 !important;
+        }
+
+        #popup_nama_pasien,
+        #popup_jenis {
+            font-size: 14pt !important;
+        }
+
+        #popupCetak button {
+            display: none !important;
+        }
+        }
+
+        @page {
+        margin: 0;
+        }
+
         .container {
             width: 350px;
             background-color: rgba(0, 0, 70, 0.85);
