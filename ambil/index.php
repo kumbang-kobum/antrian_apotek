@@ -21,54 +21,52 @@
             color: white;
         }
 
-        @media print {
-        html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-            color: black !important;
-        }
+	@media print {
+	  html, body {
+	    margin: 0 !important;
+	    padding: 0 !important;
+	    background: white !important;
+	    color: black !important;
+	  }
 
-        button, input, #hasil, .container > h3 {
-            display: none !important;
-        }
+	  button, input, input[type="text"], textarea, select,
+	  #hasil, .container > h3 {
+	    display: none !important;
+	  }
 
-        #popupCetak {
-            position: static !important;
-            display: flex !important;
-            justify-content: flex-start !important;
-            align-items: flex-start !important;
-            background: none !important;
-            height: auto !important;
-        }
+	  #popupCetak {
+	    all: unset;
+	    display: block !important;
+	    width: 210px !important; /* 7.5 cm */
+	    margin: 0 auto !important;
+	    text-align: center !important;
+	  }
 
-        #popupCetak > div {
-            box-shadow: none !important;
-            border: none !important;
-            width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
+	  #popupCetak > div {
+	    all: unset;
+	    display: block;
+	    margin: 0;
+	    padding: 0;
+	  }
 
-        #popup_no_antrian {
-            font-size: 32pt !important;
-            margin-top: 0 !important;
-        }
+	  #popup_no_antrian {
+	    font-size: 28pt !important;
+	    margin: 0;
+	    padding: 0;
+	  }
 
-        #popup_nama_pasien,
-        #popup_jenis {
-            font-size: 14pt !important;
-        }
+	  #popup_nama_pasien,
+	  #popup_jenis {
+	    font-size: 12pt !important;
+	    margin: 0;
+	    padding: 0;
+	  }
 
-        #popupCetak button {
-            display: none !important;
-        }
-        }
-
-        @page {
-        margin: 0;
-        }
-
+	  @page {
+	    size: 75mm auto;
+	    margin: 0;
+	  }
+	}
         .container {
             width: 350px;
             background-color: rgba(0, 0, 70, 0.85);
