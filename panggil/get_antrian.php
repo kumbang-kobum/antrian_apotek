@@ -1,13 +1,8 @@
 <?php
-// Pembuat Chandra Irawan M.T.I
-//  Bagi yang ingin menggunakan dan melakukan perubahan atau penambahan
-//  sangat di perbolehkan, namun aplikasi ini tidak untuk diperjual/belikan
-//  bagi yang ingin berdonasi secangkir kopi bisa melalui
-//  BCA 8110400102 A/N Chandra Irawan 
-//  ingat untuk tidak DIPERJUAL BELIKAN ini bersifat open source
-//  pengembagan aplikasi ini berdasarkan logic aplikasi delphi yang telah dibuat oleh 
-//  Emirza Wira M.T.I yang berbentul exe
 include '../config/database.php';
+
+$jenis = $_POST['jenis'] ?? '';
+$loket = $_POST['loket'] ?? '';
 
 $stmt = $pdo->prepare("
   SELECT a.no_antrian, p.nm_pasien AS nama, a.no_resep 
@@ -18,26 +13,40 @@ $stmt = $pdo->prepare("
   WHERE a.status='0' AND a.resep=? AND a.tgl_antri=CURDATE()
   ORDER BY a.no_antrian ASC LIMIT 1
 ");
-$stmt->execute([$_POST['jenis']]);
+$stmt->execute([$jenis]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($data) {
+    // Update status jadi '1' (dipanggil)
     $pdo->prepare("UPDATE antrian_farmasi_rajal SET status='1' WHERE no_resep=?")->execute([$data['no_resep']]);
-    echo json_encode(['status' => 'sukses', 'no_antrian' => $data['no_antrian'], 'nama' => $data['nama']]);
+
+    // Simpan ke last_antrian.json
+    $lastFile = __DIR__ . '/last_antrian.json';
+    $lastData = file_exists($lastFile) ? json_decode(file_get_contents($lastFile), true) : [];
+    $lastData[$jenis] = [
+        'nomor' => $data['no_antrian'],
+        'nama'  => $data['nama']
+    ];
+    file_put_contents($lastFile, json_encode($lastData, JSON_PRETTY_PRINT));
+
+    // Simpan ke last_audio.json (untuk TV Android)
+    $audioFile = __DIR__ . '/last_audio.json';
+    $audioData = [
+        'timestamp' => date('c'),
+        'nomor' => $data['no_antrian'],
+        'jenis' => $jenis,
+        'loket' => $loket
+    ];
+    file_put_contents($audioFile, json_encode($audioData, JSON_PRETTY_PRINT));
+
+    // Kirim respons sukses
+    echo json_encode([
+        'status' => 'sukses',
+        'no_antrian' => $data['no_antrian'],
+        'nama' => $data['nama']
+    ]);
 } else {
+    // Tidak ada antrian tersedia
     echo json_encode(['status' => 'kosong']);
 }
-// Tambahan simpan ke last_antrian.json
-$jenis = $_POST['jenis'];
-$lastFile = __DIR__ . '/last_antrian.json';
-
-$lastData = [];
-if (file_exists($lastFile)) {
-    $lastData = json_decode(file_get_contents($lastFile), true);
-}
-$lastData[$jenis] = [
-    'nomor' => $data['no_antrian'],
-    'nama'  => $data['nama']
-];
-file_put_contents($lastFile, json_encode($lastData));
 ?>

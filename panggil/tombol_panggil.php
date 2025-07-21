@@ -117,6 +117,14 @@
         <h2>ANTRIAN NON RACIK</h2>
         <div class="antrian-number" id="nonracik_antrian">000</div>
         <div class="antrian-name" id="nonracik_nama">-</div>
+          <form id="form-loket" style="margin-bottom: 10px;">
+      <label><input type="radio" name="loket" value="1"> Loket 1</label>
+      <label><input type="radio" name="loket" value="2"> Loket 2</label>
+      <label><input type="radio" name="loket" value="3"> Loket 3</label>
+      <label><input type="radio" name="loket" value="4"> Loket 4</label>
+      <label><input type="radio" name="loket" value="5"> Loket 5</label>
+      <label><input type="radio" name="loket" value="6"> Loket 6</label>
+        </form>
         <button onclick="panggil('Non Racik')">Panggil</button>
         <button onclick="panggilUlang('Non Racik')">Ulangi</button>
         <div class="antrian-list" id="list_nonracik"></div>
@@ -178,37 +186,59 @@ loadDaftarAntrian('Racik');
     };
 
     function panggil(jenis) {
-      fetch('get_antrian.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'jenis=' + encodeURIComponent(jenis)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'sukses') {
-          lastAntrian[jenis] = {
-            nomor: data.no_antrian,
-            nama: data.nama ?? "-"
-          };
+  // Ambil nilai loket yang dipilih
+  const loket = document.querySelector('input[name="loket"]:checked')?.value;
 
-          const idPrefix = jenis === 'Non Racik' ? 'nonracik' : 'racik';
-          document.getElementById(idPrefix + '_antrian').innerText = data.no_antrian;
-          document.getElementById(idPrefix + '_nama').innerText = lastAntrian[jenis].nama;
-          mainkanAudio(data.no_antrian, jenis);
-        } else {
-          alert("Tidak ada antrian " + jenis + " tersedia.");
-        }
-      });
+  if (!loket) {
+    alert("Silakan pilih loket terlebih dahulu!");
+    return;
+  }
+
+  // Fetch data antrian
+  fetch('get_antrian.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'jenis=' + encodeURIComponent(jenis)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'sukses') {
+      lastAntrian[jenis] = {
+        nomor: data.no_antrian,
+        nama: data.nama ?? "-"
+      };
+
+      const idPrefix = jenis === 'Non Racik' ? 'nonracik' : 'racik';
+      document.getElementById(idPrefix + '_antrian').innerText = data.no_antrian;
+      document.getElementById(idPrefix + '_nama').innerText = lastAntrian[jenis].nama;
+
+      // Panggil audio dengan nomor, jenis, dan loket
+      mainkanAudio(data.no_antrian, jenis, loket);
+    } else {
+      alert("Tidak ada antrian " + jenis + " tersedia.");
     }
+  });
+}
 
     function panggilUlang(jenis) {
-      const antrian = lastAntrian[jenis];
-      if (antrian.nomor === "000") {
-        alert("Belum ada antrian yang dipanggil untuk " + jenis);
-        return;
-      }
-      mainkanAudio(antrian.nomor, jenis);
-    }
+  const antrian = lastAntrian[jenis];
+  
+  // Ambil nilai loket yang dipilih
+  const loket = document.querySelector('input[name="loket"]:checked')?.value;
+
+  if (!loket) {
+    alert("Silakan pilih loket terlebih dahulu!");
+    return;
+  }
+
+  if (antrian.nomor === "000") {
+    alert("Belum ada antrian yang dipanggil untuk " + jenis);
+    return;
+  }
+
+  // Panggil ulang audio dengan nomor, jenis, dan loket
+  mainkanAudio(antrian.nomor, jenis, loket);
+}
   </script>
   <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
   &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani

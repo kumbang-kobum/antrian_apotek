@@ -13,12 +13,12 @@ $sql = "INSERT INTO antrian_farmasi_rajal (no_rawat, no_resep, no_antrian, statu
         VALUES (?, ?, ?, '0', CURDATE(), ?)";
 
 $stmt = $pdo->prepare($sql);
-$ok = $stmt->execute([
+$sukses = $stmt->execute([
     $_POST['no_rawat'],
     $_POST['no_resep'],
     $_POST['no_antrian'],
     $_POST['resep']
 ]);
 
-echo json_encode(['status' => $ok ? 'sukses' : 'gagal']);
+echo json_encode(['status' => $sukses ? 'sukses' : 'gagal']);
 ?>

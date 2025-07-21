@@ -1,1 +1,9 @@
-{"Non Racik":{"nomor":"003","nama":"FIFI FARIATI"},"Racik":{"nomor":"000","nama":"-"}}
+{
+    "nomor": "000",
+    "jenis": "",
+    "loket": "",
+    "Non Racik": {
+        "nomor": "064",
+        "nama": "ASTA ASWARA "
+    }
+}

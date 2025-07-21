@@ -232,6 +232,20 @@
   loadDaftarAntrian('Non Racik');
   loadDaftarAntrian('Racik');
   loadLastAntrian();
+
+  let lastTimestamp = null;
+
+setInterval(() => {
+  fetch('last_audio.json')
+    .then(res => res.json())
+    .then(data => {
+      if (data.timestamp !== lastTimestamp) {
+        lastTimestamp = data.timestamp;
+        console.log("Memutar suara dari TV:", data);
+        mainkanAudio(data.nomor, data.jenis, data.loket);
+      }
+    });
+}, 3000); // setiap 3 detik
 </script>
   <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
   &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani
