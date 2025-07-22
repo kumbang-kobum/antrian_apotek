@@ -8,28 +8,19 @@ function mainkanAudio(nomor, jenis, loket) {
   const folder = "../assets/audio/";
   audioQueue = [];
 
-  // Tambahkan awalan
   audioQueue.push("antrian");
 
-  // Tambahkan audio loket jika ada
   if (loket) {
-    //audioQueue.push("loket");         // loket.wav
-    audioQueue.push(`loket-${loket}`); // loket-1.wav, dst
-  }
-
-  // Tambahkan jenis antrian jika ada
-  if (jenis) {
-    //audioQueue.push(jenis.toLowerCase().replace(/\s+/g, '-')); // Contoh: Non Racik -> non-racik.wav
+    audioQueue.push(`loket-${loket}`);
   }
 
   audioQueue.push("nomor");
 
-  // Fungsi konversi angka
   function pecahAngka(n) {
     const hasil = [];
     n = parseInt(n);
 
-    if (isNaN(n)) return ['0']; // Jika input bukan angka, default ke '0'
+    if (isNaN(n)) return ['0'];
     if (n === 0) return ['0'];
     if (n >= 1000) {
       const ribu = Math.floor(n / 1000);
@@ -63,7 +54,6 @@ function mainkanAudio(nomor, jenis, loket) {
     return hasil;
   }
 
-  // Tambahkan ke queue
   audioQueue.push(...pecahAngka(nomor));
   isPlaying = true;
   playQueue(folder);
@@ -80,10 +70,8 @@ function playQueue(folder) {
 
   audio.play();
   audio.onended = () => playQueue(folder);
-
-  // Tangani error jika file audio tidak ditemukan
   audio.onerror = () => {
     console.error(`File audio tidak ditemukan: ${folder + nextFile}.wav`);
-    playQueue(folder); // Lanjutkan ke file berikutnya
+    playQueue(folder);
   };
 }

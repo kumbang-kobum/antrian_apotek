@@ -106,6 +106,20 @@
   padding: 5px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+#btnSuara {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      background: limegreen;
+      color: black;
+      border: none;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -117,6 +131,7 @@
         Video tidak tersedia.
       </video>
     </div>
+    <button id="btnSuara" onclick="aktifkanSuara()">🔊 Aktifkan Suara</button>
 
     <!-- KANAN: ANTRIAN NON & RACIK -->
     <div class="antrian-columns">
@@ -144,6 +159,16 @@
 
   <script src="../assets/js/audio.js"></script>
 <script>
+  function aktifkanSuara() {
+      const dummy = new Audio("../assets/audio/antrian.wav");
+      dummy.play().then(() => {
+        console.log("Autoplay suara diaktifkan.");
+        document.getElementById("btnSuara").style.display = "none";
+      }).catch(err => {
+        alert("Klik sekali lagi untuk mengaktifkan suara.");
+      });
+    }
+
   const vid = document.getElementById("edukasiVideo");
   vid.addEventListener("ended", function () {
     this.currentTime = 0;
@@ -236,16 +261,23 @@
   let lastTimestamp = null;
 
 setInterval(() => {
-  fetch('last_audio.json')
-    .then(res => res.json())
-    .then(data => {
-      if (data.timestamp !== lastTimestamp) {
-        lastTimestamp = data.timestamp;
-        console.log("Memutar suara dari TV:", data);
-        mainkanAudio(data.nomor, data.jenis, data.loket);
-      }
-    });
-}, 3000); // setiap 3 detik
+      console.log("Polling last_audio.json...");
+      fetch('last_audio.json')
+        .then(res => res.json())
+        .then(data => {
+          console.log("Data polling:", data);
+          if (!data.timestamp) return;
+
+          if (data.timestamp !== lastTimestamp) {
+            lastTimestamp = data.timestamp;
+            console.log("Memutar suara dari TV:", data);
+            mainkanAudio(data.nomor, data.jenis, data.loket);
+          }
+        })
+        .catch(err => {
+          console.error("Gagal membaca last_audio.json:", err);
+        });
+    }, 3000); // setiap 3 detik
 </script>
   <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
   &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani

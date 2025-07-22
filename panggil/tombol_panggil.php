@@ -1,12 +1,5 @@
 <!DOCTYPE html>
-<!-- Pembuat Chandra Irawan M.T.I
- Bagi yang ingin menggunakan dan melakukan perubahan atau penambahan
- sangat di perbolehkan, namun aplikasi ini tidak untuk diperjual/belikan
- bagi yang ingin berdonasi secangkir kopi bisa melalui
- BCA 8110400102 A/N Chandra Irawan 
- ingat untuk tidak DIPERJUAL BELIKAN ini bersifat open source
- pengembagan aplikasi ini berdasarkan logic aplikasi delphi yang telah dibuat oleh 
- Emirza Wira M.T.I yang berbentul exe -->
+<!-- Pembuat Chandra Irawan M.T.I -->
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -36,10 +29,10 @@
       width: 100%;
       height: 100%;
       border-radius: 15px;
-      object-fit: contain; /* sebelumnya cover */
+      object-fit: contain;
       background-color: #000;
       box-shadow: 0 0 15px black;
-}
+    }
 
     .antrian-columns {
       flex: 1;
@@ -92,45 +85,42 @@
     }
 
     .antrian-list {
-  max-height: 150px;
-  overflow-y: auto;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  margin-top: 15px;
-  padding: 10px;
-  font-size: 14px;
-  text-align: left;
-}
+      max-height: 150px;
+      overflow-y: auto;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      margin-top: 15px;
+      padding: 10px;
+      font-size: 14px;
+      text-align: left;
+    }
 
-.antrian-list div {
-  padding: 5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+    .antrian-list div {
+      padding: 5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- KANAN: ANTRIAN NON & RACIK -->
     <div class="antrian-columns">
-      <!-- Non Racikan -->
       <div class="antrian-box">
         <h2>ANTRIAN NON RACIK</h2>
         <div class="antrian-number" id="nonracik_antrian">000</div>
         <div class="antrian-name" id="nonracik_nama">-</div>
-          <form id="form-loket" style="margin-bottom: 10px;">
-      <label><input type="radio" name="loket" value="1"> Loket 1</label>
-      <label><input type="radio" name="loket" value="2"> Loket 2</label>
-      <label><input type="radio" name="loket" value="3"> Loket 3</label>
-      <label><input type="radio" name="loket" value="4"> Loket 4</label>
-      <label><input type="radio" name="loket" value="5"> Loket 5</label>
-      <label><input type="radio" name="loket" value="6"> Loket 6</label>
+        <form id="form-loket" style="margin-bottom: 10px;">
+          <label><input type="radio" name="loket" value="1"> Loket 1</label>
+          <label><input type="radio" name="loket" value="2"> Loket 2</label>
+          <label><input type="radio" name="loket" value="3"> Loket 3</label>
+          <label><input type="radio" name="loket" value="4"> Loket 4</label>
+          <label><input type="radio" name="loket" value="5"> Loket 5</label>
+          <label><input type="radio" name="loket" value="6"> Loket 6</label>
         </form>
         <button onclick="panggil('Non Racik')">Panggil</button>
         <button onclick="panggilUlang('Non Racik')">Ulangi</button>
         <div class="antrian-list" id="list_nonracik"></div>
       </div>
 
-      <!-- Racikan -->
       <div class="antrian-box">
         <h2>ANTRIAN RACIK</h2>
         <div class="antrian-number" id="racik_antrian">000</div>
@@ -144,41 +134,32 @@
 
   <script src="../assets/js/audio.js"></script>
   <script>
-//     const vid = document.getElementById("edukasiVideo");
-//     vid.addEventListener("ended", function () {
-//     this.currentTime = 0;
-//     this.play();
-//   });
-
     function loadDaftarAntrian(jenis) {
-  fetch('get_daftar_antrian.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'jenis=' + encodeURIComponent(jenis)
-  })
-  .then(res => res.json())
-  .then(data => {
-    const idList = jenis === 'Non Racik' ? 'list_nonracik' : 'list_racik';
-    const listEl = document.getElementById(idList);
-    listEl.innerHTML = "";
+      fetch('get_daftar_antrian.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'jenis=' + encodeURIComponent(jenis)
+      })
+      .then(res => res.json())
+      .then(data => {
+        const idList = jenis === 'Non Racik' ? 'list_nonracik' : 'list_racik';
+        const listEl = document.getElementById(idList);
+        listEl.innerHTML = "";
+        data.forEach((item) => {
+          const row = document.createElement("div");
+          row.innerText = `${item.no_antrian} - ${item.nama}`;
+          listEl.appendChild(row);
+        });
+      });
+    }
 
-    data.forEach((item) => {
-      const row = document.createElement("div");
-      row.innerText = `${item.no_antrian} - ${item.nama}`;
-      listEl.appendChild(row);
-    });
-  });
-}
-
-// Jalankan otomatis setiap 10 detik
-setInterval(() => {
-  loadDaftarAntrian('Non Racik');
-  loadDaftarAntrian('Racik');
-}, 10000);
-
-// Panggil sekali saat pertama load
-loadDaftarAntrian('Non Racik');
-loadDaftarAntrian('Racik');
+    // Jalankan saat load dan interval
+    loadDaftarAntrian('Non Racik');
+    loadDaftarAntrian('Racik');
+    setInterval(() => {
+      loadDaftarAntrian('Non Racik');
+      loadDaftarAntrian('Racik');
+    }, 10000);
 
     const lastAntrian = {
       "Non Racik": { nomor: "000", nama: "-" },
@@ -186,48 +167,40 @@ loadDaftarAntrian('Racik');
     };
 
     function panggil(jenis) {
-  // Ambil nilai loket yang dipilih
-  const loket = document.querySelector('input[name="loket"]:checked')?.value;
+      const loket = document.querySelector('input[name="loket"]:checked')?.value;
+      if (!loket) {
+        alert("Pilih loket terlebih dahulu!");
+        return;
+      }
 
-  if (!loket) {
-    alert("Silakan pilih loket terlebih dahulu!");
-    return;
-  }
-
-  // Fetch data antrian
-  fetch('get_antrian.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'jenis=' + encodeURIComponent(jenis)
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === 'sukses') {
-      lastAntrian[jenis] = {
-        nomor: data.no_antrian,
-        nama: data.nama ?? "-"
-      };
-
-      const idPrefix = jenis === 'Non Racik' ? 'nonracik' : 'racik';
-      document.getElementById(idPrefix + '_antrian').innerText = data.no_antrian;
-      document.getElementById(idPrefix + '_nama').innerText = lastAntrian[jenis].nama;
-
-      // Panggil audio dengan nomor, jenis, dan loket
-      mainkanAudio(data.no_antrian, jenis, loket);
-    } else {
-      alert("Tidak ada antrian " + jenis + " tersedia.");
+      fetch('get_antrian.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'jenis=' + encodeURIComponent(jenis) + '&loket=' + encodeURIComponent(loket)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'sukses') {
+          lastAntrian[jenis] = {
+            nomor: data.no_antrian,
+            nama: data.nama ?? "-"
+          };
+          const idPrefix = jenis === 'Non Racik' ? 'nonracik' : 'racik';
+          document.getElementById(idPrefix + '_antrian').innerText = data.no_antrian;
+          document.getElementById(idPrefix + '_nama').innerText = data.nama ?? "-";
+          mainkanAudio(data.no_antrian, jenis, loket);
+        } else {
+          alert("Tidak ada antrian " + jenis + " tersedia.");
+        }
+      });
     }
-  });
-}
 
     function panggilUlang(jenis) {
   const antrian = lastAntrian[jenis];
-  
-  // Ambil nilai loket yang dipilih
   const loket = document.querySelector('input[name="loket"]:checked')?.value;
 
   if (!loket) {
-    alert("Silakan pilih loket terlebih dahulu!");
+    alert("Pilih loket terlebih dahulu!");
     return;
   }
 
@@ -236,12 +209,22 @@ loadDaftarAntrian('Racik');
     return;
   }
 
-  // Panggil ulang audio dengan nomor, jenis, dan loket
+  // 1. Mainkan audio secara lokal
   mainkanAudio(antrian.nomor, jenis, loket);
+
+  // 2. Kirim ulang ke TV display
+  fetch('update_audio.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body:
+      'nomor=' + encodeURIComponent(antrian.nomor) +
+      '&jenis=' + encodeURIComponent(jenis) +
+      '&loket=' + encodeURIComponent(loket)
+  });
 }
   </script>
   <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
-  &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani
-</footer>
+    &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani
+  </footer>
 </body>
 </html>

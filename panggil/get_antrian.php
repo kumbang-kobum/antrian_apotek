@@ -30,14 +30,26 @@ if ($data) {
     file_put_contents($lastFile, json_encode($lastData, JSON_PRETTY_PRINT));
 
     // Simpan ke last_audio.json (untuk TV Android)
-    $audioFile = __DIR__ . '/last_audio.json';
-    $audioData = [
-        'timestamp' => date('c'),
-        'nomor' => $data['no_antrian'],
-        'jenis' => $jenis,
-        'loket' => $loket
-    ];
-    file_put_contents($audioFile, json_encode($audioData, JSON_PRETTY_PRINT));
+    if (!empty($data['no_antrian'])) {
+  // Simpan ke last_antrian.json
+  $lastAntrianFile = __DIR__ . '/last_antrian.json';
+  $lastAntrian = file_exists($lastAntrianFile) ? json_decode(file_get_contents($lastAntrianFile), true) : [];
+  $lastAntrian[$jenis] = [
+    'nomor' => $data['no_antrian'],
+    'nama' => $data['nama']
+  ];
+  file_put_contents($lastAntrianFile, json_encode($lastAntrian, JSON_PRETTY_PRINT));
+
+  // Simpan ke last_audio.json
+  $lastAudioFile = __DIR__ . '/last_audio.json';
+  $audioData = [
+    'timestamp' => date('c'),
+    'nomor' => $data['no_antrian'],
+    'jenis' => $jenis,
+    'loket' => $loket
+  ];
+  file_put_contents($lastAudioFile, json_encode($audioData, JSON_PRETTY_PRINT));
+}
 
     // Kirim respons sukses
     echo json_encode([
