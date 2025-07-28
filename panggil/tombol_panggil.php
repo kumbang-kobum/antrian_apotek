@@ -135,6 +135,7 @@
         <button onclick="panggil('Non Racik')">Panggil</button>
         <button onclick="panggilUlang('Non Racik')">Ulangi</button>
         <button class="home-button" onclick="window.location.href='../index.php'">🏠 Home</button>
+        <div class="antrian-list" id="list_nonracik"></div>
       </div>
 
       <div class="antrian-box">
