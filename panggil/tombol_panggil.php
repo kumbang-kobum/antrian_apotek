@@ -109,12 +109,18 @@
         <div class="antrian-number" id="nonracik_antrian">000</div>
         <div class="antrian-name" id="nonracik_nama">-</div>
         <form id="form-loket" style="margin-bottom: 10px;">
-          <label><input type="radio" name="loket" value="1"> Loket 1</label>
+          <!-- <label><input type="radio" name="loket" value="1"> Loket 1</label>
           <label><input type="radio" name="loket" value="2"> Loket 2</label>
           <label><input type="radio" name="loket" value="3"> Loket 3</label>
           <label><input type="radio" name="loket" value="4"> Loket 4</label>
           <label><input type="radio" name="loket" value="5"> Loket 5</label>
+          <label><input type="radio" name="loket" value="6"> Loket 6</label> -->
+          <label><input type="radio" name="loket" value="5"> Loket 5</label>
           <label><input type="radio" name="loket" value="6"> Loket 6</label>
+          <label><input type="radio" name="loket" value="7"> Loket 7</label>
+          <label><input type="radio" name="loket" value="8"> Loket 8</label>
+          <label><input type="radio" name="loket" value="9"> Loket 9</label>
+          <label><input type="radio" name="loket" value="10"> Loket 10</label>
         </form>
         <button onclick="panggil('Non Racik')">Panggil</button>
         <button onclick="panggilUlang('Non Racik')">Ulangi</button>
