@@ -140,8 +140,6 @@
         <h2>ANTRIAN NON RACIK</h2>
         <div class="antrian-number" id="nonracik_antrian">000</div>
         <div class="antrian-name" id="nonracik_nama">-</div>
-        <button onclick="panggil('Non Racik')">Panggil</button>
-        <button onclick="panggilUlang('Non Racik')">Ulangi</button>
         <div class="antrian-list" id="list_nonracik"></div>
       </div>
 
@@ -150,8 +148,6 @@
         <h2>ANTRIAN RACIK</h2>
         <div class="antrian-number" id="racik_antrian">000</div>
         <div class="antrian-name" id="racik_nama">-</div>
-        <button onclick="panggil('Racik')">Panggil</button>
-        <button onclick="panggilUlang('Racik')">Ulangi</button>
         <div class="antrian-list" id="list_racik"></div>
       </div>
     </div>
