@@ -15,8 +15,8 @@ import antrian_farmasi_rajal.sql pada database simrs khanza.
 
 ## terdapat 3 menu
 
-# 1. Ambil Antrian diinput menggunakan no_rawat setelah dilakukan input resep dokter, agar lebih mudah gunakan qrcode scan dan buatkan qrcode pada sep yang isinya nomor rawat, sehingga ketika ke loket farmasi petugas langsung melakukan scan untuk ambil antrian (antrian racik dan non racik otomatis terfilter dan dipisahkan)
-# 2. Tampil antrian, menampilkan urutan antrian racikan dan non racikan dan video edukasi untuk meletakan video.
-# Panggil, digunakan untuk memangil pasien ketika penyerahan obat, setiap loket melakukan panggil pasien akan diredict ke tampilan untuk dipangil dan melakukan update nomor antrian. sehingga cukup 1 tv display untuk memanggil/mengeluarkan suara
+## 1. Ambil Antrian diinput menggunakan no_rawat setelah dilakukan input resep dokter, agar lebih mudah gunakan qrcode scan dan buatkan qrcode pada sep yang isinya nomor rawat, sehingga ketika ke loket farmasi petugas langsung melakukan scan untuk ambil antrian (antrian racik dan non racik otomatis terfilter dan dipisahkan)
+## 2. Tampil antrian, menampilkan urutan antrian racikan dan non racikan dan video edukasi untuk meletakan video.
+## Panggil, digunakan untuk memangil pasien ketika penyerahan obat, setiap loket melakukan panggil pasien akan diredict ke tampilan untuk dipangil dan melakukan update nomor antrian. sehingga cukup 1 tv display untuk memanggil/mengeluarkan suara
 
 
