@@ -99,6 +99,16 @@
       padding: 5px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
+
+    .home-button {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #0b7dda;
+        }
+
+        .home-button:hover {
+            background-color: #0b7dda;
+        }
   </style>
 </head>
 <body>
@@ -124,7 +134,7 @@
         </form>
         <button onclick="panggil('Non Racik')">Panggil</button>
         <button onclick="panggilUlang('Non Racik')">Ulangi</button>
-        <div class="antrian-list" id="list_nonracik"></div>
+        <button class="home-button" onclick="window.location.href='../index.php'">🏠 Home</button>
       </div>
 
       <div class="antrian-box">

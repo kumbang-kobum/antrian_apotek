@@ -20,15 +20,17 @@
       background: linear-gradient(to bottom right, #004466, #001f33);
       color: white;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       text-align: center;
     }
 
     .portal-container {
-      max-width: 600px;
-      width: 90%;
+      max-width: 700px;
+      width: 100%;
+      padding: 20px;
     }
 
     h1 {
@@ -36,45 +38,78 @@
       margin-bottom: 40px;
     }
 
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
     .btn {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      margin: 10px 0;
-      font-size: 20px;
+      flex: 1 1 200px;
+      padding: 20px;
+      font-size: 18px;
       background-color: #2196f3;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       text-decoration: none;
+      transition: background-color 0.3s ease;
     }
 
     .btn:hover {
       background-color: #0b7dda;
     }
 
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 24px;
+    .btn span {
+      display: block;
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: rgba(0,0,50,0.5);
+      color: #ccc;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .btn-group {
+        flex-direction: column;
+        gap: 12px;
       }
 
-      .btn {
-        font-size: 18px;
-        padding: 12px;
+      .btn span {
+        font-size: 28px;
       }
     }
   </style>
 </head>
 <body>
   <div class="portal-container">
-    <h1>Selamat Datang di Antrian Apotek</h1>
-    <a class="btn" href="ambil/">Ambil Antrian</a>
-    <a class="btn" href="panggil/">Tampilkan Antrian</a>
-    <a class="btn" href="panggil/tombol_panggil.php">Panggil</a>
+    <h1>ALNAIRA</h1>
+    <p>Aplikasi Loket Naikkan Respon Antrian</p>
+    <p>RS Handayani</p>
+    <div class="btn-group">
+      <a class="btn" href="ambil/">
+        <span>🎟️</span>Ambil Antrian
+      </a>
+      <a class="btn" href="panggil/">
+        <span>💻</span>Tampilkan Antrian
+      </a>
+      <a class="btn" href="panggil/tombol_panggil.php">
+        <span>🔊</span>Panggil
+      </a>
+    </div>
   </div>
-  <footer style="text-align:center; padding:10px; background:rgba(0,0,50,0.5); color:#ccc; position:fixed; bottom:0; width:100%;">
-  &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani
-</footer>
+
+  <footer>
+    &copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani
+  </footer>
 </body>
 </html>

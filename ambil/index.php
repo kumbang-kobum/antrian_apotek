@@ -112,9 +112,21 @@
             padding: 10px;
             border-radius: 10px;
         }
+
+        .home-button {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #0b7dda;
+        }
+
+        .home-button:hover {
+            background-color: #0b7dda;
+        }
     </style>
 </head>
 <body>
+    <!-- Tombol Home -->
+<button class="home-button:hover" onclick="window.location.href='../index.php'">🏠 Home</button>
     <div class="container">
         <h3>AMBIL ANTRIAN</h3>
         <input type="text" id="no_rawat" placeholder="Masukkan No. Rawat...">
