@@ -37,6 +37,9 @@ Digunakan untuk memilih menu **ambil antrian**,**tampilkan antrian** merupakan d
 - Antrian otomatis dipisahkan menjadi **Racik** dan **Non Racik**.  
 Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat racikan dan obat nonracikan lalu langsung menerbitakan nomor antrian obatnya :
 ![Halaman Utama](./tutorial/ambilantrian.png)
+![Halaman ambil](./tutorial/ambilnomorantrian.png)
+![Halaman simpan antrian](./tutorial/simpanantrian.png)
+![Halaman cetak antrian](./tutorial/cetaknomorantrian.png)
 ---
 
 
