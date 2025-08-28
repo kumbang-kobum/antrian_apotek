@@ -1,5 +1,20 @@
 <?php
 include '../config/database.php';
+// Fungsi masking nama pasien
+function maskNamaPasien($nama) {
+    $parts = explode(' ', $nama);
+    $masked = [];
+
+    foreach ($parts as $part) {
+        if (strlen($part) <= 2) {
+            $masked[] = $part;
+        } else {
+            $masked[] = substr($part, 0, 2) . str_repeat('x', strlen($part) - 2);
+        }
+    }
+
+    return implode(' ', $masked);
+}
 
 $jenis = $_POST['jenis'] ?? '';
 $loket = $_POST['loket'] ?? '';
@@ -17,6 +32,8 @@ $stmt->execute([$jenis]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($data) {
+    // Masking nama pasien
+    $maskedNama = maskNamaPasien($data['nama']);
     // Update status jadi '1' (dipanggil)
     $pdo->prepare("UPDATE antrian_farmasi_rajal SET status='1' WHERE no_resep=?")->execute([$data['no_resep']]);
 
@@ -25,7 +42,7 @@ if ($data) {
     $lastData = file_exists($lastFile) ? json_decode(file_get_contents($lastFile), true) : [];
     $lastData[$jenis] = [
         'nomor' => $data['no_antrian'],
-        'nama'  => $data['nama']
+        'nama'  => $maskedNama
     ];
     file_put_contents($lastFile, json_encode($lastData, JSON_PRETTY_PRINT));
 
@@ -36,7 +53,7 @@ if ($data) {
   $lastAntrian = file_exists($lastAntrianFile) ? json_decode(file_get_contents($lastAntrianFile), true) : [];
   $lastAntrian[$jenis] = [
     'nomor' => $data['no_antrian'],
-    'nama' => $data['nama']
+    'nama' => $maskedNama
   ];
   file_put_contents($lastAntrianFile, json_encode($lastAntrian, JSON_PRETTY_PRINT));
 
@@ -55,7 +72,7 @@ if ($data) {
     echo json_encode([
         'status' => 'sukses',
         'no_antrian' => $data['no_antrian'],
-        'nama' => $data['nama']
+        'nama' => $maskedNama
     ]);
 } else {
     // Tidak ada antrian tersedia

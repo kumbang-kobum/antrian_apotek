@@ -9,6 +9,21 @@
 //  Emirza Wira M.T.I yang berbentul exe
 include '../config/database.php';
 
+function maskNamaPasien($nama) {
+    $parts = explode(' ', $nama);
+    $masked = [];
+
+    foreach ($parts as $part) {
+        if (strlen($part) <= 2) {
+            $masked[] = $part;
+        } else {
+            $masked[] = substr($part, 0, 2) . str_repeat('x', strlen($part) - 2);
+        }
+    }
+
+    return implode(' ', $masked);
+}
+
 $jenis = $_POST['jenis'] ?? 'Non Racik';
 
 $stmt = $pdo->prepare("SELECT a.no_antrian, p.nm_pasien AS nama
@@ -21,5 +36,11 @@ ORDER BY a.no_antrian ASC");
 
 $stmt->execute([$jenis]);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// lakukan masking sebelum kirim ke browser
+foreach ($data as &$row) {
+    $row['nama'] = maskNamaPasien($row['nama']);
+}
+
 echo json_encode($data);
 ?>

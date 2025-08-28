@@ -13,7 +13,7 @@ $no_rawat = $_POST['no_rawat'] ?? '';
 $today = date('Y-m-d');
 
 // Cek racik
-$sqlRacik = "SELECT b.no_rawat, b.no_resep, c.nm_pasien
+$sqlRacik = "SELECT b.no_rawat, b.no_resep, c.nm_pasien, c.alamat, c.no_tlp
 FROM reg_periksa a
 JOIN resep_obat b ON b.no_rawat = a.no_rawat
 JOIN pasien c ON a.no_rkm_medis = c.no_rkm_medis
@@ -30,7 +30,7 @@ $jenis = 'Racik';
 
 if (!$data) {
     // Non racik
-    $sqlNon = "SELECT b.no_rawat, b.no_resep, c.nm_pasien
+    $sqlNon = "SELECT b.no_rawat, b.no_resep, c.nm_pasien, c.alamat, c.no_tlp
     FROM reg_periksa a
     JOIN resep_obat b ON b.no_rawat = a.no_rawat
     JOIN pasien c ON a.no_rkm_medis = c.no_rkm_medis
@@ -57,7 +57,9 @@ if ($data) {
         'no_rawat' => $data['no_rawat'],
         'nm_pasien' => $data['nm_pasien'],
         'resep' => $jenis,
-        'no_antrian' => $next
+        'no_antrian' => $next,
+        'alamat' => $data['alamat'] ?? '',
+        'no_tlp' => $data['no_tlp'] ?? ''
     ]);
 } else {
     echo json_encode(['status' => 'tidak ditemukan']);

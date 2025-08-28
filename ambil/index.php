@@ -21,52 +21,52 @@
             color: white;
         }
 
-	@media print {
-	  html, body {
-	    margin: 0 !important;
-	    padding: 0 !important;
-	    background: white !important;
-	    color: black !important;
-	  }
+		@media print {
+		  html, body {
+		    margin: 0 !important;
+		    padding: 0 !important;
+		    background: white !important;
+		    color: black !important;
+		  }
 
-	  button, input, input[type="text"], textarea, select,
-	  #hasil, .container > h3 {
-	    display: none !important;
-	  }
+		  button, input, textarea, select, #hasil, .container > h3 {
+		    display: none !important;
+		  }
 
-	  #popupCetak {
-	    all: unset;
-	    display: block !important;
-	    width: 210px !important; /* 7.5 cm */
-	    margin: 0 auto !important;
-	    text-align: center !important;
-	  }
+		  #popupCetak {
+		    all: unset;
+		    display: block !important;
+		    width: 210px !important;
+		    margin: 0 auto !important;
+		    text-align: center !important;
+		  }
 
-	  #popupCetak > div {
-	    all: unset;
-	    display: block;
-	    margin: 0;
-	    padding: 0;
-	  }
+		  #popupCetak > div {
+		    all: unset;
+		    display: block;
+		    margin: 0;
+		    padding: 0;
+		  }
 
-	  #popup_no_antrian {
-	    font-size: 28pt !important;
-	    margin: 0;
-	    padding: 0;
-	  }
+		  #popup_no_antrian {
+		    font-size: 28pt !important;
+		    margin: 0;
+		    padding: 0;
+		  }
 
-	  #popup_nama_pasien,
-	  #popup_jenis {
-	    font-size: 12pt !important;
-	    margin: 0;
-	    padding: 0;
-	  }
+		  #popup_nama_pasien,
+		  #popup_jenis {
+		    font-size: 12pt !important;
+		    margin: 0;
+		    padding: 0;
+		  }
 
-	  @page {
-	    size: 75mm auto;
-	    margin: 0;
-	  }
-	}
+		  @page {
+		    size: 75mm auto;
+		    margin: 0;
+		  }
+		}
+
         .container {
             width: 350px;
             background-color: rgba(0, 0, 70, 0.85);
@@ -81,7 +81,7 @@
             margin-bottom: 20px;
         }
 
-        input[type="text"] {
+        input[type="text"], select, textarea {
             width: 100%;
             padding: 12px;
             font-size: 16px;
@@ -125,13 +125,24 @@
     </style>
 </head>
 <body>
-    <!-- Tombol Home -->
-<button class="home-button:hover" onclick="window.location.href='../index.php'">🏠 Home</button>
+    <button class="home-button" onclick="window.location.href='../index.php'">🏠 Home</button>
     <div class="container">
         <h3>AMBIL ANTRIAN</h3>
         <input type="text" id="no_rawat" placeholder="Masukkan No. Rawat...">
-        <button onclick="ambil()">Ambil Antrian</button>
 
+        <label>Jenis Ambil:</label><br>
+        <select id="jenis_ambil" onchange="toggleAntarForm()">
+            <option value="langsung">Ambil Hari Ini</option>
+            <option value="besok">Ambil Besok</option>
+            <option value="antar">Antar ke Rumah</option>
+        </select><br><br>
+
+        <div id="formAntar" style="display:none;">
+            <textarea id="alamat" placeholder="Alamat Lengkap..."></textarea>
+            <input type="text" id="no_tlp" placeholder="Nomor Telepon...">
+        </div>
+
+        <button onclick="ambil()">Ambil Antrian</button>
         <div id="hasil"></div>
     </div>
 
@@ -149,84 +160,78 @@
     </div>
 
     <script>
-    function ambil() {
-        let no_rawat = document.getElementById('no_rawat').value;
-        fetch('ambil_data.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: 'no_rawat=' + encodeURIComponent(no_rawat)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'sukses') {
-                document.getElementById('hasil').innerHTML = `
-                    <hr>
-                    <strong>Nama:</strong> ${data.nm_pasien}<br>
-                    <strong>No. Resep:</strong> ${data.no_resep}<br>
-                    <strong>Jenis Resep:</strong> ${data.resep}<br>
-                    <strong>Nomor Antrian:</strong> <b>${data.no_antrian}</b><br><br>
-                    <button onclick="simpan('${data.no_rawat}', '${data.no_resep}', '${data.no_antrian}', '${data.resep}')">Simpan</button>
-                `;
-            } else {
-                alert("Data tidak ditemukan atau sudah diambil.");
-            }
-        });
+    function toggleAntarForm() {
+        const jenis = document.getElementById('jenis_ambil').value;
+        const antarForm = document.getElementById('formAntar');
+        antarForm.style.display = (jenis === 'antar') ? 'block' : 'none';
     }
 
-//     function simpan(no_rawat, no_resep, no_antrian, resep) {
-//     fetch('simpan_antrian.php', {
-//         method: 'POST',
-//         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-//         body: `no_rawat=${no_rawat}&no_resep=${no_resep}&no_antrian=${no_antrian}&resep=${resep}`
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//         if (data.status === 'sukses') {
-//             alert("Antrian berhasil disimpan!");
-
-//             // Buka halaman cetak (popup atau tab baru)
-//             window.open(`cetak_antrian.php?no_antrian=${encodeURIComponent(no_antrian)}&nm_pasien=${encodeURIComponent(document.querySelector("#hasil").innerText.match(/Nama:\s(.+)/)[1])}&resep=${encodeURIComponent(resep)}`, '_blank');
-
-//             location.reload();
-//         } else {
-//             alert("Gagal menyimpan antrian.");
-//         }
-//     });
-// }
-
-function simpan(no_rawat, no_resep, no_antrian, resep) {
-    fetch('simpan_antrian.php', {
+    function ambil() {
+    let no_rawat = document.getElementById('no_rawat').value;
+    fetch('ambil_data.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `no_rawat=${no_rawat}&no_resep=${no_resep}&no_antrian=${no_antrian}&resep=${resep}`
+        body: 'no_rawat=' + encodeURIComponent(no_rawat)
     })
     .then(res => res.json())
     .then(data => {
         if (data.status === 'sukses') {
-            alert("Antrian berhasil disimpan!");
+            // Isi data di bawah hasil
+            document.getElementById('hasil').innerHTML = `
+                <hr>
+                <strong>Nama:</strong> ${data.nm_pasien}<br>
+                <strong>No. Resep:</strong> ${data.no_resep}<br>
+                <strong>Jenis Resep:</strong> ${data.resep}<br>
+                <strong>Nomor Antrian:</strong> <b>${data.no_antrian}</b><br><br>
+                <button onclick="simpan('${data.no_rawat}', '${data.no_resep}', '${data.no_antrian}', '${data.resep}')">Simpan</button>
+            `;
 
-            // Ambil nama pasien dari div hasil
-            let nama = document.querySelector("#hasil").innerHTML.match(/<strong>Nama:<\/strong>\s(.+?)<br>/)[1];
-
-            // Tampilkan ke modal popup
-            document.getElementById("popup_no_antrian").innerText = no_antrian;
-            document.getElementById("popup_nama_pasien").innerText = nama;
-            document.getElementById("popup_jenis").innerText = "Jenis: " + resep;
-            document.getElementById("popupCetak").style.display = "flex";
-
-            // Opsional: kosongkan form
-            document.getElementById("no_rawat").value = "";
-            document.getElementById("hasil").innerHTML = "";
+            // Jika jenis ambil = antar, isi otomatis alamat & telp
+            const jenis = document.getElementById('jenis_ambil').value;
+            if (jenis === 'antar') {
+                document.getElementById('alamat').value = data.alamat || '';
+                document.getElementById('no_tlp').value = data.no_tlp || '';
+            }
 
         } else {
-            alert("Gagal menyimpan antrian.");
+            alert("Data tidak ditemukan atau sudah diambil.");
         }
     });
 }
 
-function tutupPopup() {
-    document.getElementById("popupCetak").style.display = "none";
-}
+    function simpan(no_rawat, no_resep, no_antrian, resep) {
+        const jenis_ambil = document.getElementById('jenis_ambil').value;
+        const alamat = document.getElementById('alamat')?.value || '';
+        const no_tlp = document.getElementById('no_tlp')?.value || '';
+
+        fetch('simpan_antrian.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `no_rawat=${no_rawat}&no_resep=${no_resep}&no_antrian=${no_antrian}&resep=${resep}&jenis_ambil=${jenis_ambil}&alamat=${encodeURIComponent(alamat)}&no_tlp=${encodeURIComponent(no_tlp)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'sukses') {
+                alert("Antrian berhasil disimpan!");
+
+                let nama = document.querySelector("#hasil").innerHTML.match(/<strong>Nama:<\/strong>\s(.+?)<br>/)[1];
+
+                document.getElementById("popup_no_antrian").innerText = no_antrian;
+                document.getElementById("popup_nama_pasien").innerText = nama;
+                document.getElementById("popup_jenis").innerText = "Jenis: " + resep + " (" + jenis_ambil + ")";
+                document.getElementById("popupCetak").style.display = "flex";
+
+                document.getElementById("no_rawat").value = "";
+                document.getElementById("hasil").innerHTML = "";
+            } else {
+                alert("Gagal menyimpan antrian.");
+            }
+        });
+    }
+
+    function tutupPopup() {
+        document.getElementById("popupCetak").style.display = "none";
+    }
     </script>
 </body>
 </html>
