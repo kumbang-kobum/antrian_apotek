@@ -77,7 +77,8 @@
             }
 
             #popup_nama_pasien,
-            #popup_jenis {
+            #popup_jenis,
+            #popup_alamat {
                 font-size: 12pt !important;
                 margin: 0;
                 padding: 0;
@@ -209,6 +210,18 @@
             line-height: 1;
         }
 
+        #popup_alamat {
+            margin-top: 6px;
+            padding: 8px;
+            border-radius: 8px;
+            background: #f3f6fa;
+            color: #273241;
+            font-size: 14px;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
         .popup-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -269,6 +282,7 @@
             <h1 id="popup_no_antrian">000</h1>
             <p id="popup_nama_pasien">Nama Pasien</p>
             <p id="popup_jenis">Jenis: -</p>
+            <p id="popup_alamat">Alamat: -</p>
             <div class="popup-actions">
                 <button class="btn-print" onclick="window.print()">Cetak</button>
                 <button class="btn-close" onclick="tutupPopup()">Tutup</button>
@@ -343,6 +357,20 @@
         }
     }
 
+    function renderAlamatPopup(jenisAmbil, alamatInput) {
+        const popupAlamat = document.getElementById("popup_alamat");
+        if (!popupAlamat) return;
+
+        const alamatCetak = (alamatInput || '').trim();
+        if (jenisAmbil === 'antar') {
+            popupAlamat.style.display = "block";
+            popupAlamat.textContent = "Alamat: " + (alamatCetak !== '' ? alamatCetak : '-');
+        } else {
+            popupAlamat.style.display = "none";
+            popupAlamat.textContent = "Alamat: -";
+        }
+    }
+
     async function simpan(no_rawat, no_resep, no_antrian, resep, nama_pasien = '') {
         const jenis_ambil = document.getElementById('jenis_ambil').value;
         const alamat = document.getElementById('alamat')?.value || '';
@@ -375,6 +403,7 @@
                 document.getElementById("popup_no_antrian").innerText = nomorFinal;
                 document.getElementById("popup_nama_pasien").innerText = nama;
                 document.getElementById("popup_jenis").innerText = "Jenis: " + resep + " (" + jenis_ambil + ")";
+                renderAlamatPopup(jenis_ambil, alamat);
                 document.getElementById("popupCetak").style.display = "flex";
 
                 document.getElementById("no_rawat").value = "";
