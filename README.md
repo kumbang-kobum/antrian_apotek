@@ -61,6 +61,13 @@ Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat raci
 
 ---
 
+### 4. **Laporan Harian**
+- Menampilkan ringkasan operasional harian dari audit log internal.
+- Ringkasan meliputi jumlah ambil antrian, panggil, ulangi, error validasi, distribusi jam, dan statistik per loket.
+- Akses melalui menu **Laporan Harian** di portal utama.
+
+---
+
 ## 📜 Catatan
 - Aplikasi ini **bebas digunakan** untuk keperluan pengembangan SIMRS.  
 - **Tidak diperbolehkan untuk diperjualbelikan.**  

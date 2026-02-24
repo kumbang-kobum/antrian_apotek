@@ -105,6 +105,9 @@
       <a class="btn" href="panggil/tombol_panggil.php">
         <span>🔊</span>Panggil
       </a>
+      <a class="btn" href="laporan/">
+        <span>📊</span>Laporan Harian
+      </a>
     </div>
   </div>
 
