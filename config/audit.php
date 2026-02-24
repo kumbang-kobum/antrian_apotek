@@ -13,6 +13,7 @@ if (!function_exists('audit_log')) {
             if (!is_dir($logDir)) {
                 @mkdir($logDir, 0775, true);
             }
+            @chmod($logDir, 0777);
 
             $entry = [
                 'ts' => date('c'),
@@ -24,14 +25,15 @@ if (!function_exists('audit_log')) {
                 'data' => $data
             ];
 
+            $logFile = $logDir . '/audit.log';
             @file_put_contents(
-                $logDir . '/audit.log',
+                $logFile,
                 json_encode($entry, JSON_UNESCAPED_UNICODE) . PHP_EOL,
                 FILE_APPEND | LOCK_EX
             );
+            @chmod($logFile, 0666);
         } catch (Throwable $e) {
             // Jangan mengganggu flow utama bila logging gagal.
         }
     }
 }
-

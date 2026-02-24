@@ -20,6 +20,7 @@
     .antrian-box button:hover{background:#0b7dda}
     .antrian-list{max-height:150px;overflow-y:auto;background:rgba(255,255,255,.05);border-radius:10px;margin-top:15px;padding:10px;font-size:14px;text-align:left}
     .antrian-list div{padding:5px;border-bottom:1px solid rgba(255,255,255,.1)}
+    .list-title{margin-top:12px;font-size:13px;font-weight:bold;color:#a9d7ff;text-align:left}
     .home-button{margin-bottom:20px;padding:10px;background:#0b7dda}
   </style>
 </head>
@@ -43,10 +44,15 @@
 
         <button onclick="panggil('Non Racik')">Panggil</button>
         <button onclick="panggilUlang('Non Racik')">Ulangi</button>
+        <button onclick="lewati('Non Racik')">Lewati</button>
+        <button onclick="panggilTerlewati('Non Racik')">Panggil Terlewati</button>
         <button onclick="kirimWA('Non Racik')">Kirim WA</button>
         <button class="home-button" onclick="window.location.href='../index.php'">🏠 Home</button>
 
+        <div class="list-title">Daftar Menunggu</div>
         <div class="antrian-list" id="list_nonracik"></div>
+        <div class="list-title">Daftar Terlewati</div>
+        <div class="antrian-list" id="list_skip_nonracik"></div>
       </div>
 
       <!-- RACIK -->
@@ -57,9 +63,14 @@
 
         <button onclick="panggil('Racik')">Panggil</button>
         <button onclick="panggilUlang('Racik')">Ulangi</button>
+        <button onclick="lewati('Racik')">Lewati</button>
+        <button onclick="panggilTerlewati('Racik')">Panggil Terlewati</button>
         <button onclick="kirimWA('Racik')">Kirim WA</button>
 
+        <div class="list-title">Daftar Menunggu</div>
         <div class="antrian-list" id="list_racik"></div>
+        <div class="list-title">Daftar Terlewati</div>
+        <div class="antrian-list" id="list_skip_racik"></div>
       </div>
     </div>
   </div>
@@ -92,9 +103,33 @@
       .catch(()=>{});
     }
 
+    function loadDaftarTerlewati(jenis){
+      fetch('get_skipped_list.php', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'jenis='+encodeURIComponent(jenis)
+      })
+      .then(r=>r.json())
+      .then(data=>{
+        const idList = (jenis==='Non Racik') ? 'list_skip_nonracik' : 'list_skip_racik';
+        const el = document.getElementById(idList);
+        el.innerHTML = '';
+        data.forEach(item=>{
+          const row = document.createElement('div');
+          row.innerText = `${item.no_antrian} - ${item.nama}`;
+          el.appendChild(row);
+        });
+      })
+      .catch(()=>{});
+    }
+
     // initial & refresh tiap 10 dtk
     loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik');
-    setInterval(()=>{ loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik'); }, 10000);
+    loadDaftarTerlewati('Non Racik'); loadDaftarTerlewati('Racik');
+    setInterval(()=>{
+      loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik');
+      loadDaftarTerlewati('Non Racik'); loadDaftarTerlewati('Racik');
+    }, 10000);
 
     // ===== PANGGIL & ULANGI =====
     function panggil(jenis){
@@ -120,6 +155,8 @@
             headers:{'Content-Type':'application/x-www-form-urlencoded'},
             body:'nomor='+encodeURIComponent(d.no_antrian)+'&jenis='+encodeURIComponent(jenis)+'&loket='+encodeURIComponent(loket)
           }).catch(()=>{});
+          loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik');
+          loadDaftarTerlewati('Non Racik'); loadDaftarTerlewati('Racik');
         }else{
           alert('Tidak ada antrian '+jenis+' tersedia.');
         }
@@ -136,6 +173,65 @@
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:'nomor='+encodeURIComponent(antri.nomor)+'&jenis='+encodeURIComponent(jenis)+'&loket='+encodeURIComponent(loket)
+      });
+    }
+
+    function lewati(jenis){
+      const antri = lastAntrian[jenis];
+      const loket = document.querySelector('input[name="loket"]:checked')?.value;
+      if(!loket){ alert('Pilih loket terlebih dahulu!'); return; }
+      if(antri.nomor==='000'){ alert('Belum ada antrian yang dipanggil untuk '+jenis); return; }
+
+      fetch('skip_antrian.php', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'jenis='+encodeURIComponent(jenis)+'&loket='+encodeURIComponent(loket)+'&no_antrian='+encodeURIComponent(antri.nomor)
+      })
+      .then(r=>r.json())
+      .then(d=>{
+        if(d.status==='sukses'){
+          alert(`Antrian ${d.no_antrian} dilewati.`);
+          loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik');
+          loadDaftarTerlewati('Non Racik'); loadDaftarTerlewati('Racik');
+        }else if(d.status==='kosong'){
+          alert('Tidak ada antrian untuk dilewati.');
+        }else{
+          alert(d.pesan || 'Gagal melewati antrian.');
+        }
+      });
+    }
+
+    function panggilTerlewati(jenis){
+      const loket = document.querySelector('input[name="loket"]:checked')?.value;
+      if(!loket){ alert('Pilih loket terlebih dahulu!'); return; }
+
+      fetch('panggil_terlewati.php', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'jenis='+encodeURIComponent(jenis)+'&loket='+encodeURIComponent(loket)
+      })
+      .then(r=>r.json())
+      .then(d=>{
+        if(d.status==='sukses'){
+          lastAntrian[jenis] = { nomor:d.no_antrian, nama:(d.nama||'-') };
+          const idPrefix = (jenis==='Non Racik')?'nonracik':'racik';
+          document.getElementById(idPrefix+'_antrian').innerText = d.no_antrian;
+          document.getElementById(idPrefix+'_nama').innerText    = d.nama || '-';
+
+          // Fail-safe: samakan mekanisme trigger audio dengan tombol Panggil.
+          fetch('update_audio.php', {
+            method:'POST',
+            headers:{'Content-Type':'application/x-www-form-urlencoded'},
+            body:'nomor='+encodeURIComponent(d.no_antrian)+'&jenis='+encodeURIComponent(jenis)+'&loket='+encodeURIComponent(loket)
+          }).catch(()=>{});
+
+          loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik');
+          loadDaftarTerlewati('Non Racik'); loadDaftarTerlewati('Racik');
+        }else if(d.status==='kosong'){
+          alert('Tidak ada antrian terlewati.');
+        }else{
+          alert(d.pesan || 'Gagal memanggil antrian terlewati.');
+        }
       });
     }
 

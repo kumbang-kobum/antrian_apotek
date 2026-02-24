@@ -26,7 +26,7 @@ Aplikasi ini dikembangkan berdasarkan **logika aplikasi Delphi** yang sebelumnya
 
 ```bash
 chmod 777 panggil
-chmod 666 panggil/last_audio.json panggil/last_antrian.json
+chmod 666 panggil/last_audio.json panggil/last_antrian.json panggil/skipped_antrian.json
 ```
 
 ### Jika DB sudah terlanjur berjalan (migrasi dari skema lama)
@@ -86,6 +86,9 @@ Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat raci
 - Sistem akan melakukan update nomor antrian.  
 - Cukup menggunakan **1 TV display atau lebih** untuk memanggil/mengeluarkan suara antrian.
 - **Suara hanya diputar di halaman display** (`/panggil/`), bukan di halaman tombol panggil (`/panggil/tombol_panggil.php`).
+- Tombol **Lewati** akan memasukkan **nomor yang sedang dipanggil** ke daftar terlewati (kasus pasien no-show).
+- Tombol **Panggil Terlewati** akan memanggil kembali antrean yang dilewati (urutan FIFO).
+- Pada menu panggil, tersedia panel **Daftar Terlewati** agar petugas bisa memantau nomor yang belum hadir.
 - Jika pasien terlewat bisa dikirimkan pesan bahwa obat sudah siap diambil menggunakan **WAHA**.
 - Jika terdapat loket lebih dari satu, setiap admin loket dapat memilih loket mana yang digunakan untuk memanggil pasien.
 ![Panggil Antrian](./tutorial/panggilantrian.png )
@@ -111,7 +114,7 @@ Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat raci
 - Lakukan hard refresh bila perlu (`Cmd+Shift+R` / `Ctrl+F5`).
 - Cek update event audio:
   - `http://localhost/antrian_apotek/panggil/get_last_audio.php`
-  - file `panggil/last_audio.json` harus berubah saat klik **Panggil/Ulangi**.
+  - file `panggil/last_audio.json` harus berubah saat klik **Panggil/Ulangi/Panggil Terlewati**.
 
 ---
 

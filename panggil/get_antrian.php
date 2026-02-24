@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/audit.php';
+require_once __DIR__ . '/../config/skipped.php';
 header('Content-Type: application/json');
 
 // Fungsi masking nama pasien
@@ -21,6 +22,7 @@ function maskNamaPasien($nama) {
 
 $jenis = trim($_POST['jenis'] ?? '');
 $loket = trim($_POST['loket'] ?? '');
+$today = date('Y-m-d');
 
 if (!in_array($jenis, ['Non Racik', 'Racik'], true)) {
     audit_log('antrian.panggil.validasi_gagal', [
@@ -43,21 +45,31 @@ if ($loket !== '' && !preg_match('/^[0-9]{1,2}$/', $loket)) {
 }
 
 try {
-    $stmt = $pdo->prepare("
+    $skipped = getSkippedList($jenis, $today);
+    $sql = "
       SELECT a.no_antrian, p.nm_pasien AS nama, a.no_resep
       FROM antrian_farmasi_rajal a
       JOIN resep_obat r ON a.no_resep = r.no_resep
       JOIN reg_periksa rp ON r.no_rawat = rp.no_rawat
       JOIN pasien p ON rp.no_rkm_medis = p.no_rkm_medis
       WHERE a.status='0' AND a.resep=? AND a.tgl_antri=CURDATE()
-      ORDER BY a.no_antrian ASC LIMIT 1
-    ");
-    $stmt->execute([$jenis]);
+    ";
+    $params = [$jenis];
+    if (!empty($skipped)) {
+        $in = implode(',', array_fill(0, count($skipped), '?'));
+        $sql .= " AND a.no_resep NOT IN ($in)";
+        $params = array_merge($params, $skipped);
+    }
+    $sql .= " ORDER BY a.no_antrian ASC LIMIT 1";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($data) {
         $maskedNama = maskNamaPasien($data['nama']);
         $pdo->prepare("UPDATE antrian_farmasi_rajal SET status='1' WHERE no_resep=?")->execute([$data['no_resep']]);
+        removeSkippedNoResep($jenis, $today, $data['no_resep']);
 
         $lastAntrianFile = __DIR__ . '/last_antrian.json';
         $lastAntrian = file_exists($lastAntrianFile) ? json_decode(file_get_contents($lastAntrianFile), true) : [];
