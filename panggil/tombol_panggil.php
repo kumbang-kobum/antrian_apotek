@@ -422,6 +422,6 @@
     }
   </script>
 
-  <div class="footer">&copy; 2025 Sistem Antrian Apotek | Dibuat oleh Chandra Irawan M.T.I | RS Handayani</div>
+  <div class="footer">&copy; 2026 n2N-Sistem Antrian Apotek</div>
 </body>
 </html>
