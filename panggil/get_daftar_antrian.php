@@ -8,6 +8,7 @@
 //  pengembagan aplikasi ini berdasarkan logic aplikasi delphi yang telah dibuat oleh 
 //  Emirza Wira M.T.I yang berbentul exe
 include '../config/database.php';
+header('Content-Type: application/json');
 
 function maskNamaPasien($nama) {
     $parts = explode(' ', $nama);
@@ -24,23 +25,33 @@ function maskNamaPasien($nama) {
     return implode(' ', $masked);
 }
 
-$jenis = $_POST['jenis'] ?? 'Non Racik';
-
-$stmt = $pdo->prepare("SELECT a.no_antrian, p.nm_pasien AS nama
-FROM antrian_farmasi_rajal a
-JOIN resep_obat r ON a.no_resep = r.no_resep
-JOIN reg_periksa rp ON r.no_rawat = rp.no_rawat
-JOIN pasien p ON rp.no_rkm_medis = p.no_rkm_medis
-WHERE a.status = '0' AND a.resep = ? AND a.tgl_antri = CURDATE()
-ORDER BY a.no_antrian ASC");
-
-$stmt->execute([$jenis]);
-$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// lakukan masking sebelum kirim ke browser
-foreach ($data as &$row) {
-    $row['nama'] = maskNamaPasien($row['nama']);
+$jenis = trim($_POST['jenis'] ?? 'Non Racik');
+if (!in_array($jenis, ['Non Racik', 'Racik'], true)) {
+    // Jaga kompatibilitas frontend: kirim array kosong jika jenis invalid.
+    echo json_encode([]);
+    exit;
 }
 
-echo json_encode($data);
+try {
+    $stmt = $pdo->prepare("SELECT a.no_antrian, p.nm_pasien AS nama
+    FROM antrian_farmasi_rajal a
+    JOIN resep_obat r ON a.no_resep = r.no_resep
+    JOIN reg_periksa rp ON r.no_rawat = rp.no_rawat
+    JOIN pasien p ON rp.no_rkm_medis = p.no_rkm_medis
+    WHERE a.status = '0' AND a.resep = ? AND a.tgl_antri = CURDATE()
+    ORDER BY a.no_antrian ASC");
+
+    $stmt->execute([$jenis]);
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($data as &$row) {
+        $row['nama'] = maskNamaPasien($row['nama']);
+    }
+    unset($row);
+
+    echo json_encode($data);
+} catch (Throwable $e) {
+    // Jaga kompatibilitas frontend: saat gagal tetap kirim array kosong.
+    echo json_encode([]);
+}
 ?>

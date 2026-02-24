@@ -174,8 +174,8 @@
         body: 'no_rawat=' + encodeURIComponent(no_rawat)
     })
     .then(res => res.json())
-    .then(data => {
-        if (data.status === 'sukses') {
+	    .then(data => {
+	        if (data.status === 'sukses') {
             // Isi data di bawah hasil
             document.getElementById('hasil').innerHTML = `
                 <hr>
@@ -193,11 +193,11 @@
                 document.getElementById('no_tlp').value = data.no_tlp || '';
             }
 
-        } else {
-            alert("Data tidak ditemukan atau sudah diambil.");
-        }
-    });
-}
+	        } else {
+	            alert(data.pesan || "Data tidak ditemukan atau sudah diambil.");
+	        }
+	    });
+	}
 
 	    function simpan(no_rawat, no_resep, no_antrian, resep) {
 	        const jenis_ambil = document.getElementById('jenis_ambil').value;
