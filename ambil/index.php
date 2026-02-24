@@ -199,35 +199,36 @@
     });
 }
 
-    function simpan(no_rawat, no_resep, no_antrian, resep) {
-        const jenis_ambil = document.getElementById('jenis_ambil').value;
-        const alamat = document.getElementById('alamat')?.value || '';
-        const no_tlp = document.getElementById('no_tlp')?.value || '';
+	    function simpan(no_rawat, no_resep, no_antrian, resep) {
+	        const jenis_ambil = document.getElementById('jenis_ambil').value;
+	        const alamat = document.getElementById('alamat')?.value || '';
+	        const no_tlp = document.getElementById('no_tlp')?.value || '';
 
         fetch('simpan_antrian.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: `no_rawat=${no_rawat}&no_resep=${no_resep}&no_antrian=${no_antrian}&resep=${resep}&jenis_ambil=${jenis_ambil}&alamat=${encodeURIComponent(alamat)}&no_tlp=${encodeURIComponent(no_tlp)}`
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'sukses') {
-                alert("Antrian berhasil disimpan!");
+	        .then(res => res.json())
+	        .then(data => {
+	            if (data.status === 'sukses') {
+	                alert("Antrian berhasil disimpan!");
+	                const nomorFinal = data.no_antrian || no_antrian;
 
-                let nama = document.querySelector("#hasil").innerHTML.match(/<strong>Nama:<\/strong>\s(.+?)<br>/)[1];
+	                let nama = document.querySelector("#hasil").innerHTML.match(/<strong>Nama:<\/strong>\s(.+?)<br>/)[1];
 
-                document.getElementById("popup_no_antrian").innerText = no_antrian;
-                document.getElementById("popup_nama_pasien").innerText = nama;
-                document.getElementById("popup_jenis").innerText = "Jenis: " + resep + " (" + jenis_ambil + ")";
-                document.getElementById("popupCetak").style.display = "flex";
+	                document.getElementById("popup_no_antrian").innerText = nomorFinal;
+	                document.getElementById("popup_nama_pasien").innerText = nama;
+	                document.getElementById("popup_jenis").innerText = "Jenis: " + resep + " (" + jenis_ambil + ")";
+	                document.getElementById("popupCetak").style.display = "flex";
 
                 document.getElementById("no_rawat").value = "";
                 document.getElementById("hasil").innerHTML = "";
-            } else {
-                alert("Gagal menyimpan antrian.");
-            }
-        });
-    }
+	            } else {
+	                alert(data.pesan || "Gagal menyimpan antrian.");
+	            }
+	        });
+	    }
 
     function tutupPopup() {
         document.getElementById("popupCetak").style.display = "none";
