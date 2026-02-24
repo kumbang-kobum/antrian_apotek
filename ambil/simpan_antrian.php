@@ -8,6 +8,7 @@
 //  pengembagan aplikasi ini berdasarkan logic aplikasi delphi yang telah dibuat oleh 
 //  Emirza Wira M.T.I yang berbentul exe
 include '../config/database.php';
+include '../config/audit.php';
 
 header('Content-Type: application/json');
 
@@ -17,11 +18,23 @@ $resep = trim($_POST['resep'] ?? '');
 $today = date('Y-m-d');
 
 if ($noRawat === '' || $noResep === '' || $resep === '') {
+    audit_log('antrian.simpan.validasi_gagal', [
+        'no_rawat' => $noRawat,
+        'no_resep' => $noResep,
+        'resep' => $resep,
+        'pesan' => 'Data tidak lengkap'
+    ]);
     echo json_encode(['status' => 'gagal', 'pesan' => 'Data tidak lengkap']);
     exit;
 }
 
 if (!in_array($resep, ['Racik', 'Non Racik'], true)) {
+    audit_log('antrian.simpan.validasi_gagal', [
+        'no_rawat' => $noRawat,
+        'no_resep' => $noResep,
+        'resep' => $resep,
+        'pesan' => 'Jenis resep tidak valid'
+    ]);
     echo json_encode(['status' => 'gagal', 'pesan' => 'Jenis resep tidak valid']);
     exit;
 }
@@ -45,9 +58,16 @@ try {
 
     if ($existingNo !== false) {
         $pdo->commit();
+        $existingStr = str_pad((string)$existingNo, 3, '0', STR_PAD_LEFT);
+        audit_log('antrian.simpan.existing', [
+            'no_rawat' => $noRawat,
+            'no_resep' => $noResep,
+            'resep' => $resep,
+            'no_antrian' => $existingStr
+        ]);
         echo json_encode([
             'status' => 'sukses',
-            'no_antrian' => str_pad((string)$existingNo, 3, '0', STR_PAD_LEFT),
+            'no_antrian' => $existingStr,
             'existing' => true
         ]);
     } else {
@@ -61,6 +81,12 @@ try {
         $stmtInsert->execute([$noRawat, $noResep, $noAntrian, $resep]);
 
         $pdo->commit();
+        audit_log('antrian.simpan.baru', [
+            'no_rawat' => $noRawat,
+            'no_resep' => $noResep,
+            'resep' => $resep,
+            'no_antrian' => $noAntrian
+        ]);
         echo json_encode([
             'status' => 'sukses',
             'no_antrian' => $noAntrian,
@@ -71,6 +97,12 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
+    audit_log('antrian.simpan.gagal', [
+        'no_rawat' => $noRawat,
+        'no_resep' => $noResep,
+        'resep' => $resep,
+        'error' => $e->getMessage()
+    ]);
     echo json_encode(['status' => 'gagal', 'pesan' => $e->getMessage()]);
 } finally {
     try {

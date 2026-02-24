@@ -1,5 +1,6 @@
 <?php
 include '../config/database.php';
+include '../config/audit.php';
 header('Content-Type: application/json');
 
 // Fungsi masking nama pasien
@@ -22,11 +23,21 @@ $jenis = trim($_POST['jenis'] ?? '');
 $loket = trim($_POST['loket'] ?? '');
 
 if (!in_array($jenis, ['Non Racik', 'Racik'], true)) {
+    audit_log('antrian.panggil.validasi_gagal', [
+        'jenis' => $jenis,
+        'loket' => $loket,
+        'pesan' => 'Jenis antrian tidak valid'
+    ]);
     echo json_encode(['status' => 'gagal', 'pesan' => 'Jenis antrian tidak valid']);
     exit;
 }
 
 if ($loket !== '' && !preg_match('/^[0-9]{1,2}$/', $loket)) {
+    audit_log('antrian.panggil.validasi_gagal', [
+        'jenis' => $jenis,
+        'loket' => $loket,
+        'pesan' => 'Loket tidak valid'
+    ]);
     echo json_encode(['status' => 'gagal', 'pesan' => 'Loket tidak valid']);
     exit;
 }
@@ -72,10 +83,26 @@ try {
             'no_antrian' => $data['no_antrian'],
             'nama' => $maskedNama
         ]);
+        audit_log('antrian.panggil.sukses', [
+            'jenis' => $jenis,
+            'loket' => $loket,
+            'no_resep' => $data['no_resep'],
+            'no_antrian' => $data['no_antrian'],
+            'nama_masked' => $maskedNama
+        ]);
     } else {
         echo json_encode(['status' => 'kosong', 'pesan' => 'Tidak ada antrian tersedia']);
+        audit_log('antrian.panggil.kosong', [
+            'jenis' => $jenis,
+            'loket' => $loket
+        ]);
     }
 } catch (Throwable $e) {
     echo json_encode(['status' => 'gagal', 'pesan' => 'Terjadi kesalahan server: ' . $e->getMessage()]);
+    audit_log('antrian.panggil.gagal', [
+        'jenis' => $jenis,
+        'loket' => $loket,
+        'error' => $e->getMessage()
+    ]);
 }
 ?>
