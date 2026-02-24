@@ -89,45 +89,146 @@ ksort($perLoket, SORT_NATURAL);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laporan Harian Antrian</title>
   <style>
-    body{margin:0;font-family:"Segoe UI",sans-serif;background:linear-gradient(to bottom right,#004466,#001f33);color:#fff}
-    .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
-    .top{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
-    .card{background:rgba(0,0,70,.85);border-radius:12px;padding:16px;box-shadow:0 0 10px rgba(0,0,0,.3)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:12px}
-    .num{font-size:34px;font-weight:700;color:#ffeb3b}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.15);text-align:left}
-    .btn{padding:10px 14px;border:none;border-radius:8px;background:#2196f3;color:#fff;cursor:pointer;text-decoration:none;display:inline-block}
-    .btn:hover{background:#0b7dda}
-    input[type="date"]{padding:9px 10px;border-radius:8px;border:none}
-    .muted{color:#c7d7e2}
+    :root {
+      --bg: #747a84;
+      --panel: #575d67;
+      --line: rgba(255, 255, 255, .18);
+      --text: #f4f7fb;
+      --muted: #d5dce6;
+      --num: #ffd35b;
+      --btn-a: #31363f;
+      --btn-b: #22262d;
+      --shadow: 0 12px 24px rgba(0,0,0,.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .wrap { max-width: 1120px; margin: 20px auto; padding: 0 14px 22px; }
+
+    .top {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: flex;
+      gap: 10px;
+      align-items: end;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    h2 { margin: 0 0 6px; letter-spacing: .2px; }
+    .muted { color: var(--muted); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .grid { display: grid; gap: 12px; margin-bottom: 12px; }
+    .grid.stats { grid-template-columns: repeat(4, minmax(170px, 1fr)); }
+    .grid.main { grid-template-columns: 1.2fr 1fr; }
+
+    .num {
+      font-size: clamp(28px, 4vw, 38px);
+      font-weight: 800;
+      color: var(--num);
+      line-height: 1;
+      margin-top: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: rgba(255,255,255,.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.11);
+      text-align: left;
+    }
+    th {
+      color: #eef4fb;
+      background: rgba(0,0,0,.14);
+      font-weight: 700;
+    }
+    tr:last-child td { border-bottom: 0; }
+
+    .btn,
+    input[type="date"] {
+      border: 0;
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: 14px;
+    }
+
+    input[type="date"] {
+      background: rgba(255,255,255,.14);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .btn {
+      color: #fff;
+      text-decoration: none;
+      background: linear-gradient(180deg, var(--btn-a), var(--btn-b));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover { filter: brightness(1.08); }
+
+    .form-inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    @media (max-width: 920px) {
+      .grid.stats { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+      .grid.main { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="top">
-      <div>
-        <h2 style="margin:0 0 8px;">Laporan Harian Antrian</h2>
+      <div style="flex:1 1 260px;">
+        <h2>Laporan Harian Antrian</h2>
         <div class="muted">Ringkasan dari <code>logs/audit.log</code></div>
       </div>
-      <form method="get" style="display:flex;gap:8px;align-items:center;">
+
+      <form method="get" class="form-inline">
         <input type="date" name="tanggal" value="<?= htmlspecialchars($selectedDate, ENT_QUOTES, 'UTF-8') ?>">
         <button class="btn" type="submit">Tampilkan</button>
       </form>
+
       <a class="btn" href="../index.php">Home</a>
     </div>
 
     <?php if (!$hasLogFile): ?>
       <div class="card">File log belum ada. Jalankan aktivitas antrian dulu agar laporan terisi.</div>
     <?php else: ?>
-      <div class="grid">
+      <div class="grid stats">
         <div class="card"><div class="muted">Total Event Tercatat</div><div class="num"><?= $matchedRows ?></div></div>
         <div class="card"><div class="muted">Ambil Baru</div><div class="num"><?= $totals['antrian.simpan.baru'] ?></div></div>
         <div class="card"><div class="muted">Panggil Sukses</div><div class="num"><?= $totals['antrian.panggil.sukses'] ?></div></div>
         <div class="card"><div class="muted">Ulangi Sukses</div><div class="num"><?= $totals['antrian.ulangi.sukses'] ?></div></div>
       </div>
 
-      <div class="grid">
+      <div class="grid main">
         <div class="card">
           <h3 style="margin-top:0;">Detail Status</h3>
           <table>
@@ -173,4 +274,3 @@ ksort($perLoket, SORT_NATURAL);
   </div>
 </body>
 </html>
-
