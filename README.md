@@ -65,6 +65,7 @@ Digunakan untuk memilih menu **ambil antrian**,**tampilkan antrian** merupakan d
 - Ketika pasien ke loket farmasi, petugas cukup melakukan **scan** untuk mengambil antrian.  
 - Antrian otomatis dipisahkan menjadi **Racik** dan **Non Racik**.  
 - Tersedia tombol cepat **Ambil + Simpan + Cetak** untuk memproses satu klik.
+- Untuk jenis ambil **Antar ke Rumah**, tiket cetak akan memuat **nama pasien** dan **alamat pengantaran**.
 Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat racikan dan obat nonracikan lalu langsung menerbitakan nomor antrian obatnya :
 ![Halaman Utama](./tutorial/ambilantrian.png)
 ![Halaman ambil](./tutorial/ambilnomorantrian.png)
