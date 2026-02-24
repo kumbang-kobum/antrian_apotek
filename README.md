@@ -35,6 +35,7 @@ Digunakan untuk memilih menu **ambil antrian**,**tampilkan antrian** merupakan d
 - Buat QR Code pada **SEP** yang berisi nomor rawat.  
 - Ketika pasien ke loket farmasi, petugas cukup melakukan **scan** untuk mengambil antrian.  
 - Antrian otomatis dipisahkan menjadi **Racik** dan **Non Racik**.  
+- Tersedia tombol cepat **Ambil + Simpan + Cetak** untuk memproses satu klik.
 Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat racikan dan obat nonracikan lalu langsung menerbitakan nomor antrian obatnya :
 ![Halaman Utama](./tutorial/ambilantrian.png)
 ![Halaman ambil](./tutorial/ambilnomorantrian.png)
