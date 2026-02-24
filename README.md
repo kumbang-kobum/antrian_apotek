@@ -22,6 +22,35 @@ Aplikasi ini dikembangkan berdasarkan **logika aplikasi Delphi** yang sebelumnya
 1. Pastikan menggunakan **PHP 7.4 atau yang lebih baru**  
 2. Gunakan **MySQL** atau **MariaDB** sebagai database  
 3. Import file `antrian_farmasi_rajal.sql` ke dalam database **SIMRS Khanza**  
+4. Pastikan folder/file realtime audio bisa ditulis web server:
+
+```bash
+chmod 777 panggil
+chmod 666 panggil/last_audio.json panggil/last_antrian.json
+```
+
+### Jika DB sudah terlanjur berjalan (migrasi dari skema lama)
+Jalankan SQL berikut agar mendukung 1 `no_rawat` bisa punya banyak `no_resep`:
+
+```sql
+ALTER TABLE antrian_farmasi_rajal
+  DROP PRIMARY KEY,
+  ADD COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+
+ALTER TABLE antrian_farmasi_rajal
+  ADD UNIQUE KEY uq_tgl_no_resep (tgl_antri, no_resep),
+  ADD UNIQUE KEY uq_tgl_resep_no_antrian (tgl_antri, resep, no_antrian),
+  ADD KEY idx_status_resep_tgl_no (status, resep, tgl_antri, no_antrian);
+```
+
+Jika ada error duplicate saat menambah unique key, cek data duplikat dulu:
+
+```sql
+SELECT tgl_antri, no_resep, COUNT(*) jml
+FROM antrian_farmasi_rajal
+GROUP BY tgl_antri, no_resep
+HAVING COUNT(*) > 1;
+```
 
 ---
 
@@ -53,11 +82,12 @@ Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat raci
 
 ### 3. **Panggil Pasien**
 - Digunakan untuk **memanggil pasien** ketika obat siap diserahkan.  
-- Setiap loket yang memanggil pasien akan otomatis redirect ke tampilan display.  
+- Setiap loket yang memanggil pasien akan otomatis update data ke tampilan display.  
 - Sistem akan melakukan update nomor antrian.  
 - Cukup menggunakan **1 TV display atau lebih** untuk memanggil/mengeluarkan suara antrian.
-- jika pasien terlewat bisa dikirimkan pesan untuk memberikan informasi bahwa obat sudah bisa diambil di loket antrian menggunakan **WAHA**
--jika terdapat loket lebih dari satu setiap admin loket dapat memilih loket mana yang digunakan untuk memanggil pasien,
+- **Suara hanya diputar di halaman display** (`/panggil/`), bukan di halaman tombol panggil (`/panggil/tombol_panggil.php`).
+- Jika pasien terlewat bisa dikirimkan pesan bahwa obat sudah siap diambil menggunakan **WAHA**.
+- Jika terdapat loket lebih dari satu, setiap admin loket dapat memilih loket mana yang digunakan untuk memanggil pasien.
 ![Panggil Antrian](./tutorial/panggilantrian.png )
 
 ---
@@ -66,6 +96,7 @@ Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat raci
 - Menampilkan ringkasan operasional harian dari audit log internal.
 - Ringkasan meliputi jumlah ambil antrian, panggil, ulangi, error validasi, distribusi jam, dan statistik per loket.
 - Akses melalui menu **Laporan Harian** di portal utama.
+- Tabel `antrian_farmasi_rajal` dibersihkan otomatis oleh aplikasi dengan retensi **14 hari**.
 
 ---
 
@@ -73,6 +104,14 @@ Berikut tampilan halaman ambil antrian, dimana akan otomatis menyaring obat raci
 - Aplikasi ini **bebas digunakan** untuk keperluan pengembangan SIMRS.  
 - **Tidak diperbolehkan untuk diperjualbelikan.**  
 - Konsep open source ini bertujuan membantu pengembangan layanan kesehatan, khususnya di farmasi rawat jalan.  
+
+### Troubleshooting Suara Display
+- Pastikan membuka halaman display di: `http://localhost/antrian_apotek/panggil/`
+- Klik tombol **Aktifkan Suara** sekali di halaman display.
+- Lakukan hard refresh bila perlu (`Cmd+Shift+R` / `Ctrl+F5`).
+- Cek update event audio:
+  - `http://localhost/antrian_apotek/panggil/get_last_audio.php`
+  - file `panggil/last_audio.json` harus berubah saat klik **Panggil/Ulangi**.
 
 ---
 

@@ -2,6 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Panggil Antrian</title>
   <style>
     body{margin:0;font-family:"Segoe UI",sans-serif;background:linear-gradient(rgba(0,0,50,.6),rgba(0,0,50,.6)),url('../assets/img/bg-farmasi.jpg') no-repeat center/cover fixed;color:#fff}
@@ -61,7 +64,6 @@
     </div>
   </div>
 
-  <script src="../assets/js/audio.js"></script>
   <script>
     // ===== STATE TERKINI =====
     const lastAntrian = {
@@ -111,7 +113,13 @@
           const idPrefix = (jenis==='Non Racik')?'nonracik':'racik';
           document.getElementById(idPrefix+'_antrian').innerText = d.no_antrian;
           document.getElementById(idPrefix+'_nama').innerText    = d.nama || '-';
-          mainkanAudio(d.no_antrian, jenis, loket);
+
+          // Fail-safe: pastikan display menerima trigger audio terbaru
+          fetch('update_audio.php', {
+            method:'POST',
+            headers:{'Content-Type':'application/x-www-form-urlencoded'},
+            body:'nomor='+encodeURIComponent(d.no_antrian)+'&jenis='+encodeURIComponent(jenis)+'&loket='+encodeURIComponent(loket)
+          }).catch(()=>{});
         }else{
           alert('Tidak ada antrian '+jenis+' tersedia.');
         }
@@ -124,7 +132,6 @@
       if(!loket){ alert('Pilih loket terlebih dahulu!'); return; }
       if(antri.nomor==='000'){ alert('Belum ada antrian yang dipanggil untuk '+jenis); return; }
 
-      mainkanAudio(antri.nomor, jenis, loket);
       fetch('update_audio.php', {
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},

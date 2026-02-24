@@ -1,6 +1,6 @@
 <?php
 // menerima ulangi panggilan dari tombol_panggil.php
-include '../config/audit.php';
+require_once __DIR__ . '/../config/audit.php';
 header('Content-Type: application/json');
 
 $nomor = trim($_POST['nomor'] ?? '');
@@ -42,7 +42,7 @@ if (!preg_match('/^[0-9]{1,2}$/', $loket)) {
 
 if ($nomor !== '' && $jenis !== '' && $loket !== '') {
     $data = [
-        'timestamp' => date('c'),
+        'timestamp' => sprintf('%.6f', microtime(true)),
         'nomor' => $nomor,
         'jenis' => $jenis,
         'loket' => $loket

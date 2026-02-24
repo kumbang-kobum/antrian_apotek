@@ -10,6 +10,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Panggil Antrian</title>
   <style>
     body {
@@ -153,17 +156,28 @@
     </div>
   </div>
 
-  <script src="../assets/js/audio.js"></script>
+  <script src="../assets/js/audio.js?v=20260224"></script>
 <script>
   function aktifkanSuara() {
-      const dummy = new Audio("../assets/audio/antrian.wav");
-      dummy.play().then(() => {
-        console.log("Autoplay suara diaktifkan.");
-        document.getElementById("btnSuara").style.display = "none";
-      }).catch(err => {
-        alert("Klik sekali lagi untuk mengaktifkan suara.");
+      aktifkanAudioOutput().then((ok) => {
+        if (ok) {
+          console.log("Autoplay suara diaktifkan.");
+          document.getElementById("btnSuara").style.display = "none";
+        } else {
+          alert("Klik sekali lagi untuk mengaktifkan suara.");
+        }
       });
-    }
+  }
+
+  // Auto-coba aktivasi saat ada interaksi pertama pengguna di halaman display
+  document.addEventListener('click', () => {
+    aktifkanAudioOutput().then((ok) => {
+      if (ok) {
+        const btn = document.getElementById("btnSuara");
+        if (btn) btn.style.display = "none";
+      }
+    });
+  }, { once: true });
 
   const vid = document.getElementById("edukasiVideo");
   vid.addEventListener("ended", function () {
@@ -254,18 +268,33 @@
   loadDaftarAntrian('Racik');
   loadLastAntrian();
 
-  let lastTimestamp = null;
+  let lastAudioKey = null;
+  let audioStateInitialized = false;
 
 setInterval(() => {
       console.log("Polling last_audio.json...");
-      fetch('last_audio.json')
+      fetch('get_last_audio.php?_=' + Date.now(), { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
           console.log("Data polling:", data);
-          if (!data.timestamp) return;
+          if (!data.nomor || !data.jenis) return;
 
-          if (data.timestamp !== lastTimestamp) {
-            lastTimestamp = data.timestamp;
+          const incomingKey = [
+            data.timestamp || '',
+            data.nomor || '',
+            data.jenis || '',
+            data.loket || ''
+          ].join('|');
+
+          // Saat halaman baru dibuka/refresh, sinkronisasi state dulu tanpa memutar audio lama.
+          if (!audioStateInitialized) {
+            lastAudioKey = incomingKey;
+            audioStateInitialized = true;
+            return;
+          }
+
+          if (incomingKey !== lastAudioKey) {
+            lastAudioKey = incomingKey;
             console.log("Memutar suara dari TV:", data);
             mainkanAudio(data.nomor, data.jenis, data.loket);
           }

@@ -28,23 +28,18 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `antrian_farmasi_rajal` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `no_rawat` varchar(17) CHARACTER SET latin1 NOT NULL,
   `no_resep` varchar(14) CHARACTER SET latin1 NOT NULL,
   `no_antrian` varchar(5) CHARACTER SET latin1 NOT NULL,
   `status` enum('0','1') CHARACTER SET latin1 NOT NULL,
   `tgl_antri` date DEFAULT NULL,
-  `resep` varchar(15) CHARACTER SET latin1 DEFAULT NULL
+  `resep` varchar(15) CHARACTER SET latin1 DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tgl_no_resep` (`tgl_antri`,`no_resep`),
+  UNIQUE KEY `uq_tgl_resep_no_antrian` (`tgl_antri`,`resep`,`no_antrian`),
+  KEY `idx_status_resep_tgl_no` (`status`,`resep`,`tgl_antri`,`no_antrian`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `antrian_farmasi_rajal`
---
-ALTER TABLE `antrian_farmasi_rajal`
-  ADD PRIMARY KEY (`no_rawat`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

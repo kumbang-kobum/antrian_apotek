@@ -1,6 +1,6 @@
 <?php
-include '../config/database.php';
-include '../config/audit.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/audit.php';
 header('Content-Type: application/json');
 
 // Fungsi masking nama pasien
@@ -65,17 +65,32 @@ try {
             'nomor' => $data['no_antrian'],
             'nama' => $maskedNama
         ];
-        file_put_contents($lastAntrianFile, json_encode($lastAntrian, JSON_PRETTY_PRINT));
+        $writtenLast = file_put_contents($lastAntrianFile, json_encode($lastAntrian, JSON_PRETTY_PRINT));
 
         if (!empty($data['no_antrian'])) {
             $lastAudioFile = __DIR__ . '/last_audio.json';
             $audioData = [
-                'timestamp' => date('c'),
+                'timestamp' => sprintf('%.6f', microtime(true)),
                 'nomor' => $data['no_antrian'],
                 'jenis' => $jenis,
                 'loket' => $loket
             ];
-            file_put_contents($lastAudioFile, json_encode($audioData, JSON_PRETTY_PRINT));
+            $writtenAudio = file_put_contents($lastAudioFile, json_encode($audioData, JSON_PRETTY_PRINT));
+            if ($writtenAudio === false) {
+                audit_log('antrian.panggil.write_audio_gagal', [
+                    'jenis' => $jenis,
+                    'loket' => $loket,
+                    'no_antrian' => $data['no_antrian']
+                ]);
+            }
+        }
+
+        if ($writtenLast === false) {
+            audit_log('antrian.panggil.write_last_gagal', [
+                'jenis' => $jenis,
+                'loket' => $loket,
+                'no_antrian' => $data['no_antrian']
+            ]);
         }
 
         echo json_encode([

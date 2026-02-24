@@ -1,8 +1,36 @@
 let isPlaying = false;
 let audioQueue = [];
+let audioEnabled = false;
+let pendingAudioRequest = null;
 // Pembuat Chandra Irawan M.T.I
 
+function aktifkanAudioOutput() {
+  const testAudio = new Audio("../assets/audio/antrian.wav");
+  const p = testAudio.play();
+
+  if (p && typeof p.then === "function") {
+    return p.then(() => {
+      testAudio.pause();
+      testAudio.currentTime = 0;
+      audioEnabled = true;
+
+      if (pendingAudioRequest) {
+        const req = pendingAudioRequest;
+        pendingAudioRequest = null;
+        mainkanAudio(req.nomor, req.jenis, req.loket);
+      }
+      return true;
+    }).catch(() => false);
+  }
+  return Promise.resolve(false);
+}
+
 function mainkanAudio(nomor, jenis, loket) {
+  if (!audioEnabled) {
+    pendingAudioRequest = { nomor, jenis, loket };
+    return;
+  }
+
   if (isPlaying) return; // Cegah double klik
 
   const folder = "../assets/audio/";
@@ -68,7 +96,16 @@ function playQueue(folder) {
   const nextFile = audioQueue.shift();
   const audio = new Audio(folder + nextFile + ".wav");
 
-  audio.play();
+  const playPromise = audio.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch((err) => {
+      console.warn(`Gagal memutar audio ${nextFile}.wav`, err);
+      isPlaying = false;
+      if (err && (err.name === "NotAllowedError" || err.name === "AbortError")) {
+        audioEnabled = false;
+      }
+    });
+  }
   audio.onended = () => playQueue(folder);
   audio.onerror = () => {
     console.error(`File audio tidak ditemukan: ${folder + nextFile}.wav`);
