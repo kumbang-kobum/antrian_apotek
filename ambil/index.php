@@ -51,7 +51,9 @@
             #formAntar,
             #hasil,
             .action-btn,
-            .quick-btn {
+            .quick-btn,
+            .popup-actions,
+            .popup-actions button {
                 display: none !important;
             }
 

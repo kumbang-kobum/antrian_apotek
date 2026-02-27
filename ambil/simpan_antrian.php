@@ -15,7 +15,10 @@ header('Content-Type: application/json');
 $noRawat = trim($_POST['no_rawat'] ?? '');
 $noResep = trim($_POST['no_resep'] ?? '');
 $resep = trim($_POST['resep'] ?? '');
-$today = date('Y-m-d');
+$today = (string) $pdo->query("SELECT CURDATE()")->fetchColumn();
+if ($today === '') {
+    $today = date('Y-m-d');
+}
 
 if ($noRawat === '' || $noResep === '' || $resep === '') {
     audit_log('antrian.simpan.validasi_gagal', [
@@ -77,8 +80,8 @@ try {
         $noAntrian = str_pad((string)$nextNo, 3, '0', STR_PAD_LEFT);
 
         $stmtInsert = $pdo->prepare("INSERT INTO antrian_farmasi_rajal (no_rawat, no_resep, no_antrian, status, tgl_antri, resep)
-                                     VALUES (?, ?, ?, '0', CURDATE(), ?)");
-        $stmtInsert->execute([$noRawat, $noResep, $noAntrian, $resep]);
+                                     VALUES (?, ?, ?, '0', ?, ?)");
+        $stmtInsert->execute([$noRawat, $noResep, $noAntrian, $today, $resep]);
 
         $pdo->commit();
         audit_log('antrian.simpan.baru', [

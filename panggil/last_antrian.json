@@ -1,6 +1,10 @@
 {
     "Non Racik": {
-        "nomor": "014",
+        "nomor": "001",
+        "nama": "CHxxxxx IRxxxx"
+    },
+    "Racik": {
+        "nomor": "001",
         "nama": "ADx TRxxxxx"
     }
 }

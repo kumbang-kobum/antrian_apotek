@@ -246,6 +246,26 @@
       "Racik":     { nomor: "000", nama: "-" }
     };
 
+    async function syncLastAntrianFromServer() {
+      try {
+        const res = await fetch('get_last_antrian.php?_=' + Date.now(), { cache: 'no-store' });
+        const data = await res.json();
+        ['Non Racik', 'Racik'].forEach((jenis) => {
+          if (!data[jenis]) return;
+          const nomor = (data[jenis].nomor || '').toString().trim();
+          if (nomor !== '' && nomor !== '000') {
+            lastAntrian[jenis] = {
+              nomor: nomor,
+              nama: (data[jenis].nama || '-').toString()
+            };
+            const idPrefix = (jenis === 'Non Racik') ? 'nonracik' : 'racik';
+            document.getElementById(idPrefix + '_antrian').innerText = nomor;
+            document.getElementById(idPrefix + '_nama').innerText = lastAntrian[jenis].nama;
+          }
+        });
+      } catch (_) {}
+    }
+
     function loadDaftarAntrian(jenis){
       fetch('get_daftar_antrian.php', {
         method:'POST',
@@ -288,9 +308,11 @@
 
     loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik');
     loadDaftarTerlewati('Non Racik'); loadDaftarTerlewati('Racik');
+    syncLastAntrianFromServer();
     setInterval(()=>{
       loadDaftarAntrian('Non Racik'); loadDaftarAntrian('Racik');
       loadDaftarTerlewati('Non Racik'); loadDaftarTerlewati('Racik');
+      syncLastAntrianFromServer();
     }, 10000);
 
     function panggil(jenis){
@@ -323,7 +345,8 @@
       });
     }
 
-    function panggilUlang(jenis){
+    async function panggilUlang(jenis){
+      await syncLastAntrianFromServer();
       const antri = lastAntrian[jenis];
       const loket = document.querySelector('input[name="loket"]:checked')?.value;
       if(!loket){ alert('Pilih loket terlebih dahulu!'); return; }
@@ -336,7 +359,8 @@
       });
     }
 
-    function lewati(jenis){
+    async function lewati(jenis){
+      await syncLastAntrianFromServer();
       const antri = lastAntrian[jenis];
       const loket = document.querySelector('input[name="loket"]:checked')?.value;
       if(!loket){ alert('Pilih loket terlebih dahulu!'); return; }
